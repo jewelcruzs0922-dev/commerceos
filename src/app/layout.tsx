@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
+import { siteConfig } from "@/config/site";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "CommerceOS",
-  description:
-    "E-commerce operations dashboard for Urban Goods, a fictional US store.",
+  title: siteConfig.name,
+  description: siteConfig.description,
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
