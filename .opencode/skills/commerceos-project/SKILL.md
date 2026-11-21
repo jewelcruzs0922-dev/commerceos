@@ -13,7 +13,7 @@ Full-stack e-commerce operations platform. Portfolio-grade demo of a commercial 
 |------|-------|
 | Store | Urban Goods (fictional) |
 | Market | United States, USD |
-| Users | Shop staff: owner, admin, manager, support |
+| Users | Shop staff: owner, admin, manager, staff |
 | Scope | Internal operations only — no public storefront, no checkout, no payments, no customer email |
 | Data | Fictional products, customers, orders, inventory, analytics |
 

@@ -33,7 +33,7 @@ Always:
 - Money: line totals, discount application, tax, refund amounts, rounding. Cents in, cents out.
 - Status machines: every allowed transition and at least one rejected transition.
 - Permissions: each capability for each role, plus the "last owner" guard.
-- RLS: store A member cannot read/write store B rows; anon reads nothing; support cannot write.
+- RLS: store A member cannot read/write store B rows; anon reads nothing; staff cannot write.
 - Server Actions: invalid input, unauthorized caller, and the happy path.
 
 Never required:
@@ -78,7 +78,7 @@ Run against a local Supabase instance with seeded stores A and B.
 
 - Sign in as a store A user, select from each table, assert only A rows return and B counts are zero.
 - Attempt a cross-tenant write; assert it fails or affects zero rows.
-- Attempt a role-forbidden write as `support`; assert rejection.
+- Attempt a role-forbidden write as `staff`; assert rejection.
 - If a test needs the service role to set up data, that is acceptable — but the assertion runs as the normal user.
 
 ## Playwright conventions
@@ -97,7 +97,7 @@ Critical E2E flows (each one spec):
 3. Filter and sort orders, open one, fulfil it, status persists.
 4. Process a partial return and verify the refund amount matches line math.
 5. Adjust inventory and see the derived on-hand change.
-6. As `support`, verify write actions are absent and direct navigation to a restricted page is rejected.
+6. As `staff`, verify write actions are absent and direct navigation to a restricted page is rejected.
 
 ## Accessibility checks
 

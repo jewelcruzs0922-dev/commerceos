@@ -1,0 +1,14 @@
+.env
+.env.*
+!.env.example
+node_modules/
+.next/
+out/
+coverage/
+playwright-report/
+test-results/
+blob-report/
+.vercel/
+.playwright-mcp/
+docs/screenshots/
+CommerceOS_AI_Agent_Instructions.zip

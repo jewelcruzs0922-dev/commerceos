@@ -16,7 +16,7 @@ Core tables:
 ```text
 stores(id, name, slug, currency, timezone, created_at)
 profiles(id → auth.users, full_name, avatar_url, created_at)
-store_members(store_id, user_id, role, created_at)   -- role: owner|admin|manager|support
+store_members(store_id, user_id, role, status, created_at)   -- role: owner|admin|manager|staff
 customers(id, store_id, email, name, phone, created_at, accepts_marketing)
 products(id, store_id, title, slug, description, status, created_at, updated_at)
 product_variants(id, product_id, store_id, sku, title, price_cents, cost_cents, weight_g, barcode)
@@ -158,7 +158,7 @@ create policy orders_write on orders
 
 Role capabilities:
 
-| Capability | owner | admin | manager | support |
+| Capability | owner | admin | manager | staff |
 |-----------|-------|-------|---------|---------|
 | Read orders/customers/products | ✓ | ✓ | ✓ | ✓ |
 | Create/edit products, discounts | ✓ | ✓ | ✓ | ✗ |

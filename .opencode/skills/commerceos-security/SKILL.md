@@ -41,7 +41,7 @@ export const CAPABILITIES = {
   'orders:write':   ['owner', 'admin', 'manager'],
   'team:manage':    ['owner'],
   'settings:write': ['owner'],
-  'data:read':      ['owner', 'admin', 'manager', 'support'],
+  'data:read':      ['owner', 'admin', 'manager', 'staff'],
 } as const satisfies Record<string, readonly MemberRole[]>
 
 export function can(role: MemberRole, capability: Capability): boolean { … }
@@ -96,7 +96,7 @@ For every route, action, and query:
 - [ ] The object's `store_id` is derived from the session, and the query filters on it.
 - [ ] The object is re-read on the server; the client's claimed ownership is ignored.
 - [ ] A member of store A cannot fetch a store B id, even by pasting it directly.
-- [ ] A `support` user cannot call a manager-only action by crafting a request.
+- [ ] A `staff` user cannot call a manager-only action by crafting a request.
 - [ ] Deleting/updating by id includes the tenant predicate in the `where` clause.
 
 ## Audit trail
