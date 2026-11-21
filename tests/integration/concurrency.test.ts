@@ -21,6 +21,13 @@ const variantId = "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee";
 
 let admin: Client;
 
+function settle<T>(promise: Promise<T>): Promise<PromiseSettledResult<T>> {
+  return promise.then(
+    (value) => ({ status: "fulfilled" as const, value }),
+    (reason) => ({ status: "rejected" as const, reason })
+  );
+}
+
 function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -137,27 +144,27 @@ describeDatabase("real PostgreSQL concurrency", () => {
       await first.query("begin");
       await second.query("begin");
 
-      const firstOrder = first.query(
+      const firstOrder = settle(first.query(
         `select public.create_order(
           $1::uuid, $2::uuid, 'buyer@example.com',
           jsonb_build_array(jsonb_build_object('variant_id', $3::uuid, 'quantity', 1)),
           null, 0, 0, true, '{}'::jsonb, 'last-unit-a'
         )`,
         [storeId, customerId, variantId]
-      );
+      ));
       await sleep(150);
-      const secondOrder = second.query(
+      const secondOrder = settle(second.query(
         `select public.create_order(
           $1::uuid, $2::uuid, 'buyer@example.com',
           jsonb_build_array(jsonb_build_object('variant_id', $3::uuid, 'quantity', 1)),
           null, 0, 0, true, '{}'::jsonb, 'last-unit-b'
         )`,
         [storeId, customerId, variantId]
-      );
+      ));
       await sleep(250);
       await first.query("commit");
 
-      const results = await Promise.allSettled([firstOrder, secondOrder]);
+      const results = await Promise.all([firstOrder, secondOrder]);
       const fulfilled = results.filter((result) => result.status === "fulfilled");
       const rejected = results.filter((result) => result.status === "rejected");
 
@@ -199,29 +206,32 @@ describeDatabase("real PostgreSQL concurrency", () => {
       await first.query("begin");
       await second.query("begin");
 
-      const firstOrder = first.query<{ create_order: string }>(
+      const firstOrder = settle(first.query<{ create_order: string }>(
         `select public.create_order(
           $1::uuid, $2::uuid, 'buyer@example.com',
           jsonb_build_array(jsonb_build_object('variant_id', $3::uuid, 'quantity', 1)),
           null, 0, 0, true, '{}'::jsonb, 'same-key'
         )`,
         [storeId, customerId, variantId]
-      );
+      ));
       await sleep(150);
-      const secondOrder = second.query<{ create_order: string }>(
+      const secondOrder = settle(second.query<{ create_order: string }>(
         `select public.create_order(
           $1::uuid, $2::uuid, 'buyer@example.com',
           jsonb_build_array(jsonb_build_object('variant_id', $3::uuid, 'quantity', 1)),
           null, 0, 0, true, '{}'::jsonb, 'same-key'
         )`,
         [storeId, customerId, variantId]
-      );
+      ));
       await sleep(250);
       await first.query("commit");
 
       const [a, b] = await Promise.all([firstOrder, secondOrder]);
       await second.query("commit");
-      expect(a.rows[0]?.create_order).toBe(b.rows[0]?.create_order);
+      if (a.status !== "fulfilled" || b.status !== "fulfilled") {
+        throw new Error("same-key order submission failed");
+      }
+      expect(a.value.rows[0]?.create_order).toBe(b.value.rows[0]?.create_order);
     } finally {
       await close(first, second);
     }
@@ -245,19 +255,19 @@ describeDatabase("real PostgreSQL concurrency", () => {
     try {
       await first.query("begin");
       await second.query("begin");
-      const firstRefund = first.query(
+      const firstRefund = settle(first.query(
         `select public.record_refund_once($1::uuid, 2000, 'race one', 'refund-a')`,
         [refundOrderId]
-      );
+      ));
       await sleep(150);
-      const secondRefund = second.query(
+      const secondRefund = settle(second.query(
         `select public.record_refund_once($1::uuid, 2000, 'race two', 'refund-b')`,
         [refundOrderId]
-      );
+      ));
       await sleep(250);
       await first.query("commit");
 
-      const results = await Promise.allSettled([firstRefund, secondRefund]);
+      const results = await Promise.all([firstRefund, secondRefund]);
       const fulfilled = results.filter((result) => result.status === "fulfilled");
       const rejected = results.filter((result) => result.status === "rejected");
       expect(fulfilled).toHaveLength(1);
@@ -284,21 +294,24 @@ describeDatabase("real PostgreSQL concurrency", () => {
     try {
       await third.query("begin");
       await fourth.query("begin");
-      const a = third.query<{ record_refund_once: string }>(
+      const a = settle(third.query<{ record_refund_once: string }>(
         `select public.record_refund_once($1::uuid, 500, 'duplicate', 'same-refund')`,
         [duplicateOrderId]
-      );
+      ));
       await sleep(150);
-      const b = fourth.query<{ record_refund_once: string }>(
+      const b = settle(fourth.query<{ record_refund_once: string }>(
         `select public.record_refund_once($1::uuid, 500, 'duplicate', 'same-refund')`,
         [duplicateOrderId]
-      );
+      ));
       await sleep(250);
       await third.query("commit");
       const [firstRow, secondRow] = await Promise.all([a, b]);
       await fourth.query("commit");
-      expect(firstRow.rows[0]?.record_refund_once).toBe(
-        secondRow.rows[0]?.record_refund_once
+      if (firstRow.status !== "fulfilled" || secondRow.status !== "fulfilled") {
+        throw new Error("same-key refund submission failed");
+      }
+      expect(firstRow.value.rows[0]?.record_refund_once).toBe(
+        secondRow.value.rows[0]?.record_refund_once
       );
     } finally {
       await close(third, fourth);
@@ -330,19 +343,19 @@ describeDatabase("real PostgreSQL concurrency", () => {
     try {
       await first.query("begin");
       await second.query("begin");
-      const firstRedemption = first.query(
+      const firstRedemption = settle(first.query(
         `select * from public.redeem_discount($1::uuid, 'RACE10', $2::uuid)`,
         [storeId, firstOrder]
-      );
+      ));
       await sleep(150);
-      const secondRedemption = second.query(
+      const secondRedemption = settle(second.query(
         `select * from public.redeem_discount($1::uuid, 'RACE10', $2::uuid)`,
         [storeId, secondOrder]
-      );
+      ));
       await sleep(250);
       await first.query("commit");
 
-      const results = await Promise.allSettled([
+      const results = await Promise.all([
         firstRedemption,
         secondRedemption,
       ]);
@@ -397,20 +410,20 @@ describeDatabase("real PostgreSQL concurrency", () => {
     try {
       await first.query("begin");
       await second.query("begin");
-      const fulfillment = first.query(
+      const fulfillment = settle(first.query(
         `select public.fulfill_order($1::uuid, null)`,
         [orderId]
-      );
+      ));
       await sleep(150);
-      const cancellation = second.query(
+      const cancellation = settle(second.query(
         `select public.cancel_order($1::uuid, true)`,
         [orderId]
-      );
+      ));
       await sleep(250);
       await first.query("commit");
 
-      await fulfillment;
-      const results = await Promise.allSettled([cancellation]);
+      expect((await fulfillment).status).toBe("fulfilled");
+      const results = await Promise.all([cancellation]);
       expect(results[0]?.status).toBe("rejected");
       await second.query("rollback");
     } finally {
