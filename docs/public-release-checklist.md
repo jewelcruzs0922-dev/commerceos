@@ -95,7 +95,7 @@ Cleanup is documented in `docs/staging-readiness.md` and must not run automatica
 
 ## Repository publication (not done)
 
-- No GitHub remote exists. Creating/pushing requires explicit user authorization.
+- Private GitHub remote exists at https://github.com/jewelcruzs0922-dev/commerceos; CI run 44844970063 passed lint/typecheck/tests/audit/build and real PostgreSQL. Branch protection is blocked by the GitHub private-repo plan requirement.
 - Before pushing: re-run secret scan, confirm `.env.local` absent, confirm screenshots contain fictional data, and review README claims.
 - Required checks before merge: lint, typecheck, Vitest, PostgreSQL integration, audit, build.
 - Recommended branch protection: require PR review, require checks, disallow force pushes, require linear history.
@@ -110,7 +110,7 @@ Cleanup is documented in `docs/staging-readiness.md` and must not run automatica
 - No CAPTCHA/edge abuse protection.
 - No Storage uploads or multi-store switching.
 - Tests cover the defined suite, not every workflow or sustained load.
-- No Git remote, remote CI run, or branch protection yet.
+- Private GitHub remote and remote CI exist; branch protection is blocked by GitHub's private-repo plan requirement.
 
 ## Approval boundary
 

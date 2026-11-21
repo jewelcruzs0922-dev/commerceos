@@ -32,6 +32,7 @@ All notable changes to CommerceOS are recorded here. The project is a portfolio/
 - App-level HTTP Basic protection for staging, reusing an existing anonymous demo session, and staging-auth unit tests (128 tests total).
 - Public release-candidate review: Basic Auth bypass checks, anonymous rate-limit/cleanup review, backup/reconstruction distinction, GitHub/CI readiness, and final regression evidence.
 - Public release preparation: exact Basic Auth removal/rollback steps, final smoke checklist, feature walkthrough, and read-only anonymous Auth audit SQL.
+- Private GitHub repository, first CI run (verify + real PostgreSQL passed), and branch-protection limitation documented.
 - Operational-readiness report covering the Vercel 2FA deployment blocker, Free-plan backup gap, and anonymous-user lifecycle.
 
 ### Security

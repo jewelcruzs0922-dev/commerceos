@@ -4,8 +4,8 @@
 
 ## Current state
 
-- **Current phase:** Public Portfolio Release Preparation (protected staging verified; public access awaiting approval)
-- **Last completed phase:** Public Release Candidate Review (2026-11-21)
+- **Current phase:** Public Portfolio Release Preparation (remote CI passed; public access/branch protection awaiting approval)
+- **Last completed phase:** Remote CI Verification (2026-11-21)
 - **Overall status:** Implementation, demo, QA, handoff, hardening, and staging verification are complete. A separate staging Supabase project and Vercel staging deployment are live at https://commerceos-staging.vercel.app. All migrations and demo data are applied; HTTP Basic protection blocks unauthenticated document requests; guest Auth/session/sign-out, CSP/headers, responsive layouts, accessibility, and export checks pass 10/10 Playwright tests against the protected hosted URL. No public production/demo approval exists.
 - **Deployment status:** Staging deployed at https://commerceos-staging.vercel.app. No custom domain, deployment protection, or public production/demo approval.
 - **Production approval:** Not granted
@@ -42,6 +42,7 @@
 | 10.2 | Staging Readiness | Complete | 2026-11-21 | 5 real-PG concurrency tests, function/policy audits, 10 E2E, idempotency locks, auth session test, anonymous/backup findings; not deployed |
 | 10.3 | Staging Deployment and Verification | Complete | 2026-11-21 | Separate staging Supabase + Vercel; hosted 10/10 E2E; CSP/headers/auth guest flow verified |
 | 10.4 | Staging Protection | Complete | 2026-11-21 | App-level HTTP Basic protection; unauth 401; hosted 10/10 with credentials; public demo not approved |
+| 10.5 | Remote CI Verification | Complete | 2026-11-21 | Private GitHub repo; CI verify + PostgreSQL database jobs pass; branch protection blocked by plan; no public demo |
 
 ## Environment and setup
 
@@ -57,7 +58,7 @@
 - Anonymous sign-ins: enabled in `supabase/config.toml` and the hosted Auth provider settings. Email confirmation remains enabled for normal staff registration.
 - Database types: `src/types/database.ts` generated from the migrations by `npm run db:types` (PGlite). Regenerate with `supabase gen types typescript --local` when Docker or a linked project is available.
 - Vercel staging: deployed at https://commerceos-staging.vercel.app, no custom domain. App-level HTTP Basic protection (`STAGING_BASIC_USER` / `STAGING_BASIC_PASSWORD`) returns 401 without credentials. Public-demo approval remains separate.
-- GitHub remote: Not configured. Repository guidance and public-repo secret-scan commands are in `docs/deployment.md`; most application work is still uncommitted.
+- GitHub remote: private https://github.com/jewelcruzs0922-dev/commerceos, branch main. CI run 44844970063 passed verify + database; e2e job skipped (manual). Branch protection blocked by GitHub's private-repo plan requirement.
 - Required environment variables (placeholders in `.env.example`): `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `NEXT_PUBLIC_SITE_URL`, `DEMO_MODE`; `SUPABASE_SERVICE_ROLE_KEY` is a placeholder and unused
 - Handoff docs: `README.md`, `CHANGELOG.md`, and `docs/{architecture,database-schema,security,setup-guide,deployment,hardening-report,quality-report,staging-readiness,operational-readiness,release-candidate-review,public-release-checklist,feature-walkthrough,function-audit,policy-audit,portfolio-notes}.md`; four production-build screenshots are in `docs/screenshots`.
 - Secret scan: no JWT, service-role value, private email, or project reference found in candidate files or Git history. The scan commands themselves contain pattern names only.
@@ -291,3 +292,15 @@
 - **Approval boundary:** do not remove Basic Auth, publish, change DNS, add a domain, upgrade paid services, or delete users/data without explicit approval.
 
 **Public release preparation is complete. Public access remains unapproved.**
+
+## Remote CI Verification report
+
+- **Phase:** Remote CI Verification
+- **Status:** Complete. Private repository and first CI run succeeded.
+- **Repository:** https://github.com/jewelcruzs0922-dev/commerceos (private, main).
+- **CI run:** https://github.com/jewelcruzs0922-dev/commerceos/actions/runs/44844970063 � success. verify: npm ci, lint, typecheck, 128 Vitest, audit, build. database: real PostgreSQL integration 5/5. e2e: skipped by manual gate.
+- **Branch protection:** GitHub API returned 403: upgrade to Pro or make repository public. Not enabled. Public visibility requires user approval.
+- **Deployment:** staging remains protected at https://commerceos-staging.vercel.app; Basic Auth still enabled; no public release.
+- **Manual user setup:** decide whether to make the repository public (then configure branch protection) or upgrade GitHub; approve public demo before removing Basic Auth.
+
+**Remote CI is verified. Public release remains unapproved.**
