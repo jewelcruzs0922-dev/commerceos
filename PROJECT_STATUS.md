@@ -58,7 +58,7 @@
 - Anonymous sign-ins: enabled in `supabase/config.toml` and the hosted Auth provider settings. Email confirmation remains enabled for normal staff registration.
 - Database types: `src/types/database.ts` generated from the migrations by `npm run db:types` (PGlite). Regenerate with `supabase gen types typescript --local` when Docker or a linked project is available.
 - Vercel staging: deployed at https://commerceos-staging.vercel.app, no custom domain. App-level HTTP Basic protection (`STAGING_BASIC_USER` / `STAGING_BASIC_PASSWORD`) returns 401 without credentials. Public-demo approval remains separate.
-- GitHub remote: private https://github.com/jewelcruzs0922-dev/commerceos, branch main. CI run 44844970063 passed verify + database; e2e job skipped (manual). Branch protection blocked by GitHub's private-repo plan requirement.
+- GitHub remote: private https://github.com/jewelcruzs0922-dev/commerceos, branch main. CI run 44845899537 passed verify + database; e2e job skipped (manual). Branch protection blocked by GitHub's private-repo plan requirement.
 - Required environment variables (placeholders in `.env.example`): `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `NEXT_PUBLIC_SITE_URL`, `DEMO_MODE`; `SUPABASE_SERVICE_ROLE_KEY` is a placeholder and unused
 - Handoff docs: `README.md`, `CHANGELOG.md`, and `docs/{architecture,database-schema,security,setup-guide,deployment,hardening-report,quality-report,staging-readiness,operational-readiness,release-candidate-review,public-release-checklist,feature-walkthrough,function-audit,policy-audit,portfolio-notes}.md`; four production-build screenshots are in `docs/screenshots`.
 - Secret scan: no JWT, service-role value, private email, or project reference found in candidate files or Git history. The scan commands themselves contain pattern names only.
@@ -298,7 +298,7 @@
 - **Phase:** Remote CI Verification
 - **Status:** Complete. Private repository and first CI run succeeded.
 - **Repository:** https://github.com/jewelcruzs0922-dev/commerceos (private, main).
-- **CI run:** https://github.com/jewelcruzs0922-dev/commerceos/actions/runs/44844970063 � success. verify: npm ci, lint, typecheck, 128 Vitest, audit, build. database: real PostgreSQL integration 5/5. e2e: skipped by manual gate.
+- **CI run:** https://github.com/jewelcruzs0922-dev/commerceos/actions/runs/44845899537 � success. verify: npm ci, lint, typecheck, 128 Vitest, audit, build. database: real PostgreSQL integration 5/5. e2e: skipped by manual gate.
 - **Branch protection:** GitHub API returned 403: upgrade to Pro or make repository public. Not enabled. Public visibility requires user approval.
 - **Deployment:** staging remains protected at https://commerceos-staging.vercel.app; Basic Auth still enabled; no public release.
 - **Manual user setup:** decide whether to make the repository public (then configure branch protection) or upgrade GitHub; approve public demo before removing Basic Auth.

@@ -40,7 +40,7 @@ The demo action now reuses an existing anonymous session instead of signing in a
 
 ## CI
 
-`.github/workflows/ci.yml` has `verify`, `database`, and `e2e` jobs. YAML parses locally and the database job uses `postgres:17`. Private remote: https://github.com/jewelcruzs0922-dev/commerceos. CI run 44844970063 passed `verify` and `database`; the manual `e2e` job remained skipped as designed. Branch protection could not be enabled because GitHub requires Pro for private-repository branch protection. The repository is private; public visibility requires user approval.
+`.github/workflows/ci.yml` has `verify`, `database`, and `e2e` jobs. YAML parses locally and the database job uses `postgres:17`. Private remote: https://github.com/jewelcruzs0922-dev/commerceos. CI run 44845899537 passed `verify` and `database`; the manual `e2e` job remained skipped as designed. Branch protection could not be enabled because GitHub requires Pro for private-repository branch protection. The repository is private; public visibility requires user approval.
 
 ## Vercel deployment
 

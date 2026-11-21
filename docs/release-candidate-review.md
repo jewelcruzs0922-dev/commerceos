@@ -35,7 +35,7 @@ Basic Auth applies in the proxy before routing, so route handlers, exports, call
 
 ## GitHub and CI
 
-- Private GitHub remote exists at https://github.com/jewelcruzs0922-dev/commerceos. Local code was committed/pushed after explicit "go" authorization. CI run 44844970063 passed `verify` and `database`; `e2e` stayed skipped as manual.
+- Private GitHub remote exists at https://github.com/jewelcruzs0922-dev/commerceos. Local code was committed/pushed after explicit "go" authorization. CI run 44845899537 passed `verify` and `database`; `e2e` stayed skipped as manual.
 - `.gitignore` excludes `.env*`, `.vercel`, Playwright artifacts, instruction ZIP, and the local agent folder.
 - CI workflow ran remotely: lint, typecheck, 128 Vitest, audit, build, and real PostgreSQL passed. The `e2e` job is manual/gated.
 - Recommended branch protection: require `verify` and `database` checks, require PR review, disallow force pushes, require linear history, and keep secrets out of pull-request workflows.
