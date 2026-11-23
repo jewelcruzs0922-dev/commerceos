@@ -2,7 +2,7 @@
 
 ## Status
 
-**Public unlisted staging deployed; public production not deployed.** Staging: https://commerceos-staging.vercel.app (Vercel project under Azurite, Supabase staging project, `noindex`, no custom domain, deployment protection not enabled, HTTP Basic removed). The read-only guest demo is available from `/login` and guest onboarding. Public production still requires explicit approval.
+**Public unlisted staging deployed; public production not deployed.** Staging: https://commerceos-staging.vercel.app (Vercel project under Azurite, Supabase staging project, `noindex`, no custom domain, deployment protection not enabled, HTTP Basic removed). The read-only guest demo is available from `/login` and guest onboarding. Current deployment `dpl_77tbMyQ4emeG3JdLpihPxZvJSx4s` records source commit `e0a96ba`. Public production still requires explicit approval.
 
 `vercel.json` prepares the build configuration only. It does not create a project or publish anything.
 
