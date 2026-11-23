@@ -2,7 +2,7 @@
 
 ## Status
 
-**Staging deployed; public production not deployed.** Staging: https://commerceos-staging.vercel.app (Vercel project under Azurite, Supabase staging project, unlisted, no custom domain, deployment protection not enabled). Public production/demo still requires explicit approval.
+**Public unlisted staging deployed; public production not deployed.** Staging: https://commerceos-staging.vercel.app (Vercel project under Azurite, Supabase staging project, `noindex`, no custom domain, deployment protection not enabled, HTTP Basic removed). The read-only guest demo is available from `/login` and guest onboarding. Public production still requires explicit approval.
 
 `vercel.json` prepares the build configuration only. It does not create a project or publish anything.
 
@@ -24,7 +24,7 @@ Set these in Vercel for **Production** and, if preview deployments are used, for
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Anon/publishable key; safe for the browser |
 | `NEXT_PUBLIC_SITE_URL` | Yes | Exact production origin, e.g. `https://commerceos.example.com`; used for auth email redirects and invite links |
 | `DEMO_MODE` | Recommended | `true` enables the read-only guest demo and guarded reset |
-| `STAGING_BASIC_USER` / `STAGING_BASIC_PASSWORD` | Staging only | Optional HTTP Basic protection; remove only for an approved public demo |
+| `STAGING_BASIC_USER` / `STAGING_BASIC_PASSWORD` | Optional | HTTP Basic protection for private staging; removed from the current public unlisted demo |
 | `SUPABASE_SERVICE_ROLE_KEY` | No | Reserved and unused by app code; do not add unless a future admin tool needs it |
 
 Rules:
@@ -50,18 +50,19 @@ Rules:
 - [x] No service-role key used by the app.
 - [x] Secret scan run against tracked/untracked candidate files and history.
 - [x] Deployment does not require a paid service change.
-- [ ] **User has reviewed this checklist.**
-- [ ] **User has explicitly approved deployment.**
-- [ ] CI workflow has run successfully on the remote repository.
+- [x] **User approved the public unlisted staging demo.**
+- [x] CI workflow has run successfully on the remote repository.
+- [x] Staging deployment performed.
+- [x] Staging post-deployment smoke test completed.
+- [ ] Public production approved.
 - [ ] Staging database concurrency suite passed against the deployment target.
 - [ ] Auth lifecycle and email delivery tested in staging.
 - [ ] Recovery accepted despite Free-plan lack of scheduled backups.
 - [ ] Production Supabase Auth URLs updated.
-- [ ] Vercel project created and environment variables entered.
-- [ ] Deployment performed.
-- [ ] Post-deployment smoke test completed.
+- [ ] Separate production Vercel project created and environment variables entered.
+- [ ] Production post-deployment smoke test completed.
 
-Unchecked items are intentional. Do not deploy until the user approves.
+Unchecked items are intentional. Do not deploy public production until the user approves.
 
 ## 1. Prepare Supabase
 

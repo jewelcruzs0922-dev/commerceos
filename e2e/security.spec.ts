@@ -51,3 +51,8 @@ test("CSP uses a nonce and produces no browser violations", async ({ page }) => 
   ).toBeVisible();
   expect(violations).toEqual([]);
 });
+
+test("public pages are marked noindex", async ({ request }) => {
+  const response = await request.get("/login");
+  expect(response.headers()["x-robots-tag"]).toBe("noindex");
+});

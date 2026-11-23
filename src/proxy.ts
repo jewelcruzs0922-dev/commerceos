@@ -11,6 +11,8 @@ import {
   isStagingProtected,
 } from "@/lib/security/staging-auth";
 import { getSupabasePublicConfig } from "@/lib/supabase/config";
+import { authCookieOptions } from "@/lib/supabase/cookie-options";
+import { fetchWithTimeout } from "@/lib/supabase/fetch";
 
 function withCsp(
   response: NextResponse,
@@ -108,6 +110,7 @@ export async function proxy(request: NextRequest) {
   );
 
   const supabase = createServerClient<Database>(supabaseConfig.url, supabaseConfig.key, {
+    global: { fetch: fetchWithTimeout },
     cookies: {
       getAll() {
         return request.cookies.getAll();
@@ -125,7 +128,10 @@ export async function proxy(request: NextRequest) {
           contentSecurityPolicy
         );
         for (const { name, value, options } of cookiesToSet) {
-          response.cookies.set(name, value, options);
+          response.cookies.set(name, value, {
+            ...options,
+            ...authCookieOptions(),
+          });
         }
         for (const [key, value] of Object.entries(headers)) {
           response.headers.set(key, value);

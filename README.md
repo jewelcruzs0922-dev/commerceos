@@ -4,7 +4,7 @@ CommerceOS is an internal e-commerce operations workspace for the fictional US s
 
 The project is a portfolio-grade demonstration of server-first React, strict TypeScript, tenant-scoped Postgres access, row-level security, transactional commerce workflows, and a restrained operational interface.
 
-> **Staging:** https://commerceos-staging.vercel.app � password-protected, fictional data, no custom domain. Public production/demo is not approved.
+> **Staging:** https://commerceos-staging.vercel.app — public and unlisted, fictional data, no custom domain. Public production is not approved.
 
 ![CommerceOS overview](docs/screenshots/dashboard.png)
 
@@ -14,7 +14,7 @@ Phase 10 — Deployment and Handoff is complete, followed by a focused productio
 
 The hardening pass removed direct writes to workflow-owned tables, made all 19 public database functions security-definer with an empty search path, converted the four reporting views to security-invoker, added a nonce-based CSP, and added CI plus catalog-level audit tests.
 
-A separate staging Supabase project and Vercel deployment are live. HTTP Basic protection blocks unauthenticated document requests. The hosted Playwright suite passes 10/10 with credentials, including guest Auth, session reload/sign-out, CSP, accessibility, and responsive checks. Public production/demo approval is still pending. `PROJECT_STATUS.md` records verified state and remaining risks.
+A separate staging Supabase project and Vercel deployment are live. Staging is public and unlisted, with `noindex` metadata and a read-only guest demo; staff routes remain protected by Supabase Auth. Hosted checks cover guest Auth, session reload/sign-out, CSP, accessibility, and responsive layouts. Public production approval is still pending. `PROJECT_STATUS.md` records verified state and remaining risks.
 
 ## Screenshots
 
@@ -117,7 +117,7 @@ Fill in `.env.local`, then open <http://localhost:3000>. The root redirects to `
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Public | Yes | Supabase anon/publishable key |
 | `NEXT_PUBLIC_SITE_URL` | Public | Yes in production | Origin for auth email redirects and invite links |
 | `DEMO_MODE` | Server-only | For demo | Enables guest entry and the owner reset tool |
-| `STAGING_BASIC_USER` / `STAGING_BASIC_PASSWORD` | Server-only | Staging only | Optional HTTP Basic protection for the protected staging deployment |
+| `STAGING_BASIC_USER` / `STAGING_BASIC_PASSWORD` | Server-only | No | Optional HTTP Basic protection for private staging; removed for the public unlisted demo |
 | `SUPABASE_SERVICE_ROLE_KEY` | Server-only | No | Reserved placeholder; not used by application code |
 
 Next.js inlines `NEXT_PUBLIC_*` values at build time. Production builds need the production values present. Never expose or commit the service-role key.
@@ -169,7 +169,7 @@ npm run typecheck
 npm run build
 ```
 
-Latest verified results: **128 Vitest tests across 19 files**, **5 real-PostgreSQL concurrency tests**, and **10 Playwright tests**; lint/typecheck/build pass and `npm audit` reports **0 vulnerabilities**. The hardening and idempotency-lock migrations are applied to the hosted demo.
+Latest verified results: **166 Vitest tests across 23 files**, **5 real-PostgreSQL concurrency tests**, and **11 Playwright tests**; lint/typecheck/build pass and `npm audit` reports **0 vulnerabilities**. The hardening and idempotency-lock migrations are applied to the hosted demo.
 
 Playwright needs Chromium installed once:
 
@@ -183,16 +183,20 @@ See [`docs/security.md`](docs/security.md) for audit evidence and residual risks
 
 ## Limitations
 
-- No public production deployment or custom domain; the staging URL is unlisted and deployment protection is not enabled.
+- No public production deployment or custom domain; the staging URL is public, unlisted, and `noindex`, with deployment protection not enabled.
 - No multi-store switching; the app resolves the first active membership.
 - No Supabase Storage uploads. Image fields accept URLs only.
 - No real payment provider, checkout, email, SMS, or customer communication.
 - No per-user notification read state; notifications are store-wide.
 - No saved report definitions; analytics views compute from persisted orders.
-- CI is defined but has not run on a remote repository yet.
+- CI has run on the private GitHub repository; branch protection is unavailable on the current GitHub plan.
 - Real-PostgreSQL concurrency tests passed locally on PostgreSQL 18.7; they have not run against the hosted Supabase deployment or under sustained load.
 - Email confirmation requires working outbound email in the Supabase project.
-- Anonymous demo auth users accumulate; reset clears demo memberships, not auth rows.
+- Staff email confirmation, password recovery, and expired reset links are not fully exercised.
+- Anonymous demo auth users accumulate; reset clears demo memberships, not auth rows. Anonymous sign-in is limited to roughly 30 attempts/hour/IP.
+- Initial dashboard loads can occasionally take 20–30 seconds from external database latency; Supabase requests now abort after 30 seconds rather than hanging indefinitely.
+- No 10-visitor concurrent demo load test has been run.
+- Supabase Free plan has no backups or point-in-time recovery; recovery is recreate and reseed.
 - Refund and order idempotency keys now use advisory locks plus a unique index; sustained multi-connection load is still unmeasured.
 
 ## Documentation
@@ -200,6 +204,7 @@ See [`docs/security.md`](docs/security.md) for audit evidence and residual risks
 - [`docs/architecture.md`](docs/architecture.md)
 - [`docs/database-schema.md`](docs/database-schema.md)
 - [`docs/security.md`](docs/security.md)
+- [`docs/final-security-verification.md`](docs/final-security-verification.md)
 - [`docs/setup-guide.md`](docs/setup-guide.md)
 - [`docs/deployment.md`](docs/deployment.md)
 - [`docs/hardening-report.md`](docs/hardening-report.md)

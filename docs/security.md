@@ -115,7 +115,7 @@ This closes the prior medium-integrity finding where a manager could bypass work
 
 Images are restricted to `picsum.photos`, `fastly.picsum.photos`, `images.unsplash.com`, and `*.supabase.co`.
 
-Staging can be protected with optional server-only HTTP Basic credentials (`STAGING_BASIC_USER` / `STAGING_BASIC_PASSWORD`). The hosted staging URL returns 401 without them. The public demo removes those variables.
+Staging can be protected with optional server-only HTTP Basic credentials (`STAGING_BASIC_USER` / `STAGING_BASIC_PASSWORD`). The current staging demo is public and unlisted: those variables were removed, the project was redeployed, and app pages send `noindex`. Staff routes remain protected by Supabase Auth; the guest demo is read-only.
 
 A nonce-based **Content-Security-Policy** is generated per request in `src/proxy.ts` and applied to document responses. It uses `script-src 'self' 'nonce-…' 'strict-dynamic'`, allows Tailwind/Recharts inline styles, restricts images/connections to the app and Supabase, and sets `frame-ancestors 'none'`, `object-src 'none'`, `base-uri 'self'`, `form-action 'self'`, and `upgrade-insecure-requests` in production. The root layout passes the nonce to the theme script. Playwright asserts the header and that `/login` renders without CSP console violations.
 
@@ -136,26 +136,27 @@ A nonce-based **Content-Security-Policy** is generated per request in `src/proxy
 
 Last verified:
 
-- `npm test` — **128 tests across 19 files**, including catalog-level security-audit, direct-write denial, view-isolation, duplicate-submission, and workflow suites against migrated PGlite.
+- `npm test` — **166 tests across 23 files**, including catalog-level security-audit, direct-write denial, view-isolation, duplicate-submission, workflow suites against migrated PGlite, 26 viewer-denied Server Actions, a 7-test tenant matrix with forged store ids, and Supabase request timeout handling.
 - `npm run test:integration` � **5 real-PostgreSQL tests** with two independent connections and overlapping transactions.
-- `npm run test:e2e` — **10 Playwright tests**: guest entry, read-only writes, protected redirects, responsive overflow, keyboard entry, axe checks, headers, export rejection, and CSP nonce/browser violations.
+- `npm run test:e2e` — **11 Playwright tests**: guest entry, read-only writes, protected redirects, responsive overflow, keyboard entry, axe checks, headers, export rejection, and CSP nonce/browser violations.
 - `npm run lint`, `npm run typecheck`, `npm run build` — pass, **31 routes**.
 - `npm audit` — **0 vulnerabilities** after removing the unused shadcn CLI and vendoring its Tailwind companion stylesheet.
 - Hosted checks — anonymous viewer read 350 orders; direct update/insert returned 403/42501; `create_order` returned 400/P0001; demo reset regenerated data; reconciliation views clean.
 - Hosted catalog verification — 19 definer functions with empty `search_path`, 0 direct write grants on the nine workflow tables, 4 security-invoker views, 0 write policies on those tables.
+- Public staging verification — `/login` 200; `/dashboard` redirects unauthenticated visitors; CSP nonce, HSTS, frame denial, permissions policy, and `noindex` metadata present; no client source maps in `.next/static`; no service-role env names in the client bundle; `npm audit` 0.
 
 ## Residual risks
 
 | Risk | Severity | Status |
 | --- | --- | --- |
 | Anonymous auth users accumulate (57 on the hosted demo) | Low operations | Documented; cleanup query requires approval |
-| CI workflow has not executed on a remote repository | Low delivery | Definition added; first remote run pending |
+| Branch protection unavailable on the current private GitHub plan | Low delivery | CI runs remotely; branch protection remains a documented limitation |
 | Duplicate-submission tests share one PGlite connection; not a multi-connection load test | Low assurance | Honest limitation; row locks and unique indexes still exercised |
 | Same-key idempotency is serialized by advisory locks; sustained load is unmeasured | Low | Real PG two-connection test passed |
 | Supabase Free plan has no project backups | Medium operations | Documented; recover by recreating and reseeding the fictional demo |
 | External placeholder images rather than Storage | Low product | Intentional |
 | No Storage bucket policies because uploads are disabled | N/A | No upload surface exists |
-| No public production deployment; staging is unlisted and unprotected | Operational | Staging deployed; public demo awaiting approval |
+| No public production deployment; staging is public, unlisted, and `noindex` | Operational | Staging demo live; public production awaiting approval |
 
 No known critical, high, or medium unresolved security finding remains after the hardening pass. The prior direct-write and CSP findings are closed.
 

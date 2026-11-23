@@ -203,14 +203,16 @@ export async function startDemo(): Promise<FormActionState> {
     };
   }
 
-  if (!existingUser.user) {
+  const createdSession = !existingUser.user;
+
+  if (createdSession) {
     const { error } = await supabase.auth.signInAnonymously();
 
     if (error) {
       return {
         status: "error",
         message:
-          "The demo session could not start. Anonymous sign-ins may be disabled.",
+          "The demo session could not start. Anonymous sign-ins may be rate-limited; wait a minute and try again.",
       };
     }
   }
@@ -218,10 +220,12 @@ export async function startDemo(): Promise<FormActionState> {
   const { error: joinError } = await supabase.rpc("join_demo_store");
 
   if (joinError) {
-    await supabase.auth.signOut();
+    if (createdSession) {
+      await supabase.auth.signOut();
+    }
     return {
       status: "error",
-      message: "The demo store is not ready yet. Try again shortly.",
+      message: "The demo workspace is busy. Wait a moment and try again.",
     };
   }
 

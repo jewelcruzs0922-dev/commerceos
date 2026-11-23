@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to CommerceOS are recorded here. The project is a portfolio/demo application and has not been deployed.
+All notable changes to CommerceOS are recorded here. The project is a portfolio/demo application; public unlisted staging is deployed at https://commerceos-staging.vercel.app, while public production is not deployed.
 
 ## [Unreleased] — Phase 10, deployment and handoff
 
@@ -17,6 +17,13 @@ All notable changes to CommerceOS are recorded here. The project is a portfolio/
 
 ### Changed
 
+- Staging is now public and unlisted: removed `STAGING_BASIC_USER` / `STAGING_BASIC_PASSWORD`, redeployed, and confirmed `noindex` metadata.
+- Guest onboarding now offers the read-only demo instead of a broken create-store form when an anonymous guest has no store.
+- Demo start preserves an existing anonymous session when joining the demo store fails; error copy now mentions rate limiting.
+- Added a 4-test cross-tenant read matrix using one seeded store plus a minimal second tenant.
+- Deployment audit: source maps absent from client output, no service-role env names in `.next/static`, CSP/HSTS/frame/permissions headers verified on the live URL.
+- Auth cookies are now HttpOnly with `SameSite=Lax` and `Secure` on https deployments; the sidebar preference cookie adds `Secure` on https. `X-Powered-By` is disabled and `X-Robots-Tag: noindex` is sent. Supabase requests abort after 30 seconds instead of hanging indefinitely.
+- Added a 26-action viewer authorization suite, three forged-tenant RPC tests, and `docs/final-security-verification.md`.
 - Redacted the private Supabase project reference from public handoff status.
 - Order detail header de-duplicates repeated status labels.
 - `.gitignore` now excludes local agent artifacts and the instruction ZIP.

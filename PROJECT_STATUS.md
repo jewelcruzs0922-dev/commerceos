@@ -4,10 +4,10 @@
 
 ## Current state
 
-- **Current phase:** Visual Refinement â€” green/yellow identity applied and verified
+- **Current phase:** Complete for public staging — final ChatGPT sign-off received
 - **Last completed phase:** Green/Yellow Visual Redesign (2026-11-22)
-- **Overall status:** Implementation, demo, QA, handoff, hardening, and staging verification are complete. A separate staging Supabase project and Vercel staging deployment are live at https://commerceos-staging.vercel.app. All migrations and demo data are applied; HTTP Basic protection blocks unauthenticated document requests; guest Auth/session/sign-out, CSP/headers, responsive layouts, accessibility, and export checks pass 10/10 Playwright tests against the protected hosted URL. The interface now uses the green/yellow Retail Operations direction: full-bleed deep green shell and auth rail, soft neutral canvas, white rounded work surface, bright yellow demo/attention/selected navigation/chart highlights, green primary actions, open ledger tables, responsive table adaptations, and simplified empty states. No public production/demo approval exists.
-- **Deployment status:** Staging deployed at https://commerceos-staging.vercel.app. No custom domain, deployment protection, or public production/demo approval.
+- **Overall status:** Implementation, demo, QA, handoff, hardening, and staging verification are complete. A separate staging Supabase project and Vercel staging deployment are live at https://commerceos-staging.vercel.app. Staging is now public and unlisted: HTTP Basic protection was removed, all pages send `noindex`, and guest onboarding offers the read-only demo when no store is attached. Guest Auth/session/sign-out, CSP/headers, responsive layouts, accessibility, and export checks pass. The interface uses the green/yellow Retail Operations direction: full-bleed deep green shell and auth rail, soft neutral canvas, white work surface, bright yellow demo/attention/selected navigation/chart highlights, green primary actions, open ledger tables, responsive table adaptations, and simplified empty states. ChatGPT reviewed the live public staging build and approved it for public staging, not production. It requested three follow-ups: final adversarial security verification, demo reliability/performance hardening, and final auth/release sign-off. Adversarial action/tenant tests and the final security report are complete; Supabase requests now abort after 30 seconds. ChatGPT signed off: staging approved for portfolio presentation, not production. Staff email/reset, 10-visitor load, backups, and deployed-commit parity remain documented limitations. No public production approval exists.
+- **Deployment status:** Public unlisted staging at https://commerceos-staging.vercel.app. No custom domain and no public production deployment.
 - **Production approval:** Not granted
 
 ## Project decisions
@@ -16,7 +16,7 @@
 - Product: standalone e-commerce operations dashboard
 - Frontend: Next.js 16 App Router, React 19, TypeScript strict, Tailwind CSS v4, shadcn/ui (`radix-nova` style)
 - Backend: Supabase project provisioned; schema and RLS applied; auth URL configured for local development
-- Hosting target: Vercel (deployment requires explicit approval)
+- Hosting target: Vercel (public production requires explicit approval; public unlisted staging is approved)
 - Demo store: Urban Goods
 - Demo market/currency: United States / USD
 - Data: fictional seeded data only
@@ -44,6 +44,8 @@
 | 10.4 | Staging Protection | Complete | 2026-11-21 | App-level HTTP Basic protection; unauth 401; hosted 10/10 with credentials; public demo not approved |
 | 10.5 | Remote CI Verification | Complete | 2026-11-21 | Private GitHub repo; CI verify + PostgreSQL database jobs pass; branch protection blocked by plan; no public demo |
 | 11 | Site-wide Visual Refinement | Complete | 2026-11-22 | Green/yellow Retail Operations identity applied across shell, auth, Overview, list modules, Analytics, Reports, Team, toolbars, tables, status labels, loading, empty states, detail screens, and Settings; responsive tables adapted; stale Supabase keep-alive stalls reduced and dashboard over-fetch reduced; 128 unit tests, manual axe/overflow, build pass; demo-login E2E rate-limited |
+| 11.1 | Public Staging Access and Audit Follow-up | Complete | 2026-11-24 | Basic Auth removed; public unlisted staging; guest onboarding demo fixed; added 4 cross-tenant read-matrix tests and 3 auth-cookie tests; hardened auth cookies (HttpOnly, secure on https), disabled X-Powered-By, and checked deployment headers, noindex, source maps, and client bundle; ChatGPT approved public staging, not production |
+| 11.2 | Post-Audit Hardening | Complete with documented limits | 2026-11-24 | Added 26-action viewer authorization suite, forged-tenant RPC tests, 30s Supabase abort, `X-Robots-Tag`, and final security report; staff mailbox, 10-visitor load, backups, and deployed-commit parity remain documented limits |
 
 ## Environment and setup
 
@@ -58,13 +60,13 @@
 - Local env: `.env.local` contains the project URL, legacy anon key, and `DEMO_MODE=true`; untracked and ignored. The service-role key remains unset and unused.
 - Anonymous sign-ins: enabled in `supabase/config.toml` and the hosted Auth provider settings. Email confirmation remains enabled for normal staff registration.
 - Database types: `src/types/database.ts` generated from the migrations by `npm run db:types` (PGlite). Regenerate with `supabase gen types typescript --local` when Docker or a linked project is available.
-- Vercel staging: deployed at https://commerceos-staging.vercel.app, no custom domain. App-level HTTP Basic protection (`STAGING_BASIC_USER` / `STAGING_BASIC_PASSWORD`) returns 401 without credentials. Public-demo approval remains separate.
+- Vercel staging: public unlisted deployment at https://commerceos-staging.vercel.app, no custom domain. `STAGING_BASIC_USER` / `STAGING_BASIC_PASSWORD` were removed and the project redeployed; pages send `noindex` metadata. Latest deployment: `dpl_77tbMyQ4emeG3JdLpihPxZvJSx4s`. Public production approval remains separate.
 - GitHub remote: private https://github.com/jewelcruzs0922-dev/commerceos, branch main. CI run 44845899537 passed verify + database; e2e job skipped (manual). Branch protection blocked by GitHub's private-repo plan requirement.
 - Required environment variables (placeholders in `.env.example`): `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `NEXT_PUBLIC_SITE_URL`, `DEMO_MODE`; `SUPABASE_SERVICE_ROLE_KEY` is a placeholder and unused
-- Handoff docs: `README.md`, `CHANGELOG.md`, and `docs/{architecture,database-schema,security,setup-guide,deployment,hardening-report,quality-report,staging-readiness,operational-readiness,release-candidate-review,public-release-checklist,feature-walkthrough,function-audit,policy-audit,portfolio-notes}.md`; four production-build screenshots are in `docs/screenshots`.
+- Handoff docs: `README.md`, `CHANGELOG.md`, and `docs/{architecture,database-schema,security,setup-guide,deployment,hardening-report,quality-report,staging-readiness,operational-readiness,release-candidate-review,public-release-checklist,feature-walkthrough,function-audit,policy-audit,final-security-verification,portfolio-notes}.md`; four production-build screenshots are in `docs/screenshots`.
 - Secret scan: no JWT, service-role value, private email, or project reference found in candidate files or Git history. The scan commands themselves contain pattern names only.
 - Secrets status: no secrets committed; `.env*` ignored except `.env.example`
-- QA tooling: Vitest 5 with jsdom/RTL, Playwright 1.65.1 with Chromium, and `@axe-core/playwright`. `npm test` is 128 tests across 19 files; `npm run test:integration` is 5 real-PostgreSQL concurrency tests; `npm run test:e2e` is 10 tests.
+- QA tooling: Vitest 5 with jsdom/RTL, Playwright 1.65.1 with Chromium, and `@axe-core/playwright`. `npm test` is 166 tests across 23 files; `npm run test:integration` is 5 real-PostgreSQL concurrency tests; `npm run test:e2e` is 10 tests.
 - Warm local-development navigation timing (not Lighthouse or field Core Web Vitals): dashboard TTFB 814 ms / DCL 1,349 ms / load 1,440 ms; products 831 / 1,540 / 1,553; orders 850 / 1,559 / 1,572; analytics 741 / 1,157 / 1,341.
 - Security headers verified in responses: `X-Content-Type-Options`, `Referrer-Policy`, `X-Frame-Options`, `Cross-Origin-Opener-Policy`, `Permissions-Policy`, `Strict-Transport-Security`, and a per-request nonce `Content-Security-Policy`.
 - Dependency audit: `npm audit` reports 0 vulnerabilities. The unused shadcn CLI was removed and its Tailwind companion stylesheet vendored.
@@ -91,7 +93,7 @@
 - CI is defined in `.github/workflows/ci.yml`, parses locally, and has not run on a remote repository. E2E depends on the hosted demo, `DEMO_MODE=true`, and anonymous sign-ins.
 - Staging application is deployed and verified. Guest session reload, sign-out, protected routes, CSP, headers, accessibility, and responsive checks pass against the hosted URL. Staff email confirmation/reset and owner sign-in remain untested because no staff account/email flow was exercised. Staging deployment protection is not enabled and the URL is unlisted.
 - Supabase Free plan has no scheduled backups; recovery depends on recreating and reseeding the fictional demo. This is documented and accepted only for staging, not public production.
-- Test coverage is 128 Vitest tests across 19 files, 5 real-PostgreSQL concurrency tests, and 10 Playwright E2E tests: permissions, env parsing, redirect safety, route classification, UUID validation, money/CSV parsers, analytics formulas/timezones, order state transitions, CSP directives, component tests, schema/RLS, core/advanced workflows, Phase 7, demo seed, direct-write denial, view isolation, duplicate submissions, catalog security invariants, real two-connection concurrency, guest entry/session/sign-out, read-only surfaces, protected redirects, responsive overflow, keyboard entry, axe checks, headers, export rejection, and CSP.
+- Test coverage is 166 Vitest tests across 23 files, 5 real-PostgreSQL concurrency tests, and 11 Playwright E2E tests: permissions, env parsing, redirect safety, route classification, UUID validation, money/CSV parsers, analytics formulas/timezones, order state transitions, CSP directives, component tests, schema/RLS, core/advanced workflows, Phase 7, demo seed, direct-write denial, view isolation, duplicate submissions, catalog security invariants, real two-connection concurrency, guest entry/session/sign-out, read-only surfaces, protected redirects, responsive overflow, keyboard entry, axe checks, headers, export rejection, and CSP.
 - `npm audit` reports 0 vulnerabilities. The shadcn CLI was removed and its Tailwind companion stylesheet vendored in `src/app/shadcn-tailwind.css`.
 - `CommerceOS_AI_Agent_Instructions.zip` sits untracked in the repository root. It is the source instruction package, not application source. Not committed.
 - ESLint is pinned to 9.39.5. ESLint 10 is rejected by `eslint-config-next`'s bundled plugins. Upgrade when those plugins support 10.
