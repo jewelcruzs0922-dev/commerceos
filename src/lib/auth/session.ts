@@ -21,6 +21,7 @@ export type MembershipContext = {
 export type AuthContext = {
   userId: string;
   email: string;
+  isAnonymous: boolean;
   membership: MembershipContext | null;
 };
 
@@ -31,7 +32,7 @@ export const getAuthContext = cache(async (): Promise<AuthContext | null> => {
 
   const supabase = await createClient();
 
-  let claims: { sub?: string; email?: string } | null = null;
+  let claims: { sub?: string; email?: string; is_anonymous?: boolean } | null = null;
   try {
     const { data, error } = await supabase.auth.getClaims();
     if (!error) {
@@ -47,6 +48,7 @@ export const getAuthContext = cache(async (): Promise<AuthContext | null> => {
 
   const userId = claims.sub;
   const email = typeof claims.email === "string" ? claims.email : "";
+  const isAnonymous = claims.is_anonymous === true;
 
   const { data: membership, error: membershipError } = await supabase
     .from("store_members")
@@ -61,7 +63,7 @@ export const getAuthContext = cache(async (): Promise<AuthContext | null> => {
   }
 
   if (!membership) {
-    return { userId, email, membership: null };
+    return { userId, email, isAnonymous, membership: null };
   }
 
   const { data: store, error: storeError } = await supabase
@@ -77,6 +79,7 @@ export const getAuthContext = cache(async (): Promise<AuthContext | null> => {
   return {
     userId,
     email,
+    isAnonymous,
     membership: {
       storeId: membership.store_id,
       storeName: store.name,

@@ -5,7 +5,7 @@ import { PlayIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { startDemo } from "@/features/auth/actions";
 
-export function DemoButton() {
+export function DemoButton({ showDivider = true }: { showDivider?: boolean }) {
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
@@ -21,11 +21,13 @@ export function DemoButton() {
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex items-center gap-3 text-xs text-muted-foreground">
-        <span className="h-px flex-1 bg-border" aria-hidden="true" />
-        or
-        <span className="h-px flex-1 bg-border" aria-hidden="true" />
-      </div>
+      {showDivider ? (
+        <div className="flex items-center gap-3 text-xs text-muted-foreground">
+          <span className="h-px flex-1 bg-border" aria-hidden="true" />
+          or
+          <span className="h-px flex-1 bg-border" aria-hidden="true" />
+        </div>
+      ) : null}
       <Button
         type="button"
         variant="outline"
