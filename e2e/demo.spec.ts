@@ -18,10 +18,14 @@ test("guest demo opens the seeded read-only workspace", async ({ page }) => {
   await enterDemo(page);
 
   await expect(page.getByRole("heading", { name: "Overview" })).toBeVisible();
-  await expect(page.getByText("Seeded dataset")).toBeVisible();
-  await expect(page.getByText("Fictional Urban Goods data")).toBeVisible();
+  await expect(page.getByText("Demo workspace")).toBeVisible();
+  await expect(page.getByText("Fictional demo data")).toBeVisible();
+  await expect(page.getByText("Last 30 days").first()).toBeVisible();
   await expect(page.getByText("Net sales").first()).toBeVisible();
   await expect(page.getByRole("heading", { name: "Recent orders" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Needs attention" })
+  ).toBeVisible();
 
   await page.goto("/products");
   await expect(page.getByRole("heading", { name: "Products" })).toBeVisible();

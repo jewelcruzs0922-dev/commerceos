@@ -157,15 +157,15 @@ export default async function OrderDetailPage({
             <h2 id="items-title" className="text-sm font-semibold">
               Line items
             </h2>
-            <div className="overflow-hidden rounded-lg border border-border">
-              <Table className="min-w-[40rem]">
-                <TableHeader className="bg-muted/60">
+            <div className="ledger-table">
+              <Table className="min-w-0 sm:min-w-[34rem]">
+                <TableHeader className="bg-secondary/55">
                   <TableRow>
                     <TableHead scope="col">Item</TableHead>
                     <TableHead scope="col" className="text-right">
                       Qty
                     </TableHead>
-                    <TableHead scope="col" className="text-right">
+                    <TableHead scope="col" className="hidden text-right sm:table-cell">
                       Unit price
                     </TableHead>
                     <TableHead scope="col" className="text-right">
@@ -199,7 +199,7 @@ export default async function OrderDetailPage({
                           </span>
                         ) : null}
                       </TableCell>
-                      <TableCell className="text-right font-mono text-xs tabular-nums">
+                      <TableCell className="hidden text-right font-mono text-xs tabular-nums sm:table-cell">
                         {formatMoney(item.unit_price_cents)}
                       </TableCell>
                       <TableCell className="text-right font-mono text-xs tabular-nums">
@@ -324,7 +324,7 @@ export default async function OrderDetailPage({
         </div>
 
         <div className="flex flex-col gap-6">
-          <section className="flex flex-col gap-3 rounded-lg border border-border bg-card p-4">
+          <section className="flex flex-col gap-2 rounded-xl border border-primary/15 bg-secondary/60 p-4">
             <h2 className="text-sm font-semibold">Customer</h2>
             {order.customer_id ? (
               <Link
@@ -339,7 +339,7 @@ export default async function OrderDetailPage({
             <p className="text-xs text-muted-foreground">{order.email}</p>
           </section>
 
-          <section className="flex flex-col gap-2 rounded-lg border border-border bg-card p-4">
+          <section className="flex flex-col gap-2 border-t border-border pt-4">
             <h2 className="text-sm font-semibold">Shipping address</h2>
             {Object.keys(address).length === 0 ? (
               <p className="text-xs text-muted-foreground">
@@ -360,7 +360,7 @@ export default async function OrderDetailPage({
             )}
           </section>
 
-          <section className="flex flex-col gap-3 rounded-lg border border-border bg-card p-4">
+          <section className="flex flex-col gap-3 border-t border-border pt-4">
             <h2 className="text-sm font-semibold">Timeline</h2>
             {timeline.length === 0 ? (
               <p className="text-xs text-muted-foreground">

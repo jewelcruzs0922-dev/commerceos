@@ -26,7 +26,6 @@ export function SalesChart({ data }: { data: ChartPoint[] }) {
         >
           <CartesianGrid
             stroke="var(--border)"
-            strokeDasharray="3 3"
             vertical={false}
           />
           <XAxis
@@ -69,7 +68,7 @@ export function SalesChart({ data }: { data: ChartPoint[] }) {
             dataKey="revenue"
             name="Net sales ($)"
             stroke="var(--chart-1)"
-            strokeWidth={2}
+            strokeWidth={2.5}
             dot={false}
             isAnimationActive={false}
           />
@@ -79,7 +78,7 @@ export function SalesChart({ data }: { data: ChartPoint[] }) {
             dataKey="orders"
             name="Orders"
             stroke="var(--chart-2)"
-            strokeWidth={1.5}
+            strokeWidth={2}
             dot={false}
             isAnimationActive={false}
           />

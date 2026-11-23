@@ -67,14 +67,14 @@ Never ship these unless the brief explicitly asks and you record why:
 - Use the scale in `design-system.md`. Do not hand-pick arbitrary px values.
 - Numerals in tables, KPIs, and money: `font-variant-numeric: tabular-nums`.
 - Line length under 80 characters for prose. Tables and dense lists are exempt.
-- No all-caps tracked labels as a decorative eyebrow. Uppercase is allowed only for immutable status chips and table column headers at small size.
+- No all-caps tracked labels as a decorative eyebrow. Table column headers are 12px, sentence case, and muted. Status labels use sentence case, a ledger tick, and text — never a capsule.
 - Never accent a single word in a heading with italic, color, or a different weight.
 - Truncate with ellipsis and expose full text via `title` or a popover — never let a name break row alignment.
 
 ## Color
 
-- Restrained palette: neutral surfaces, ink text, one accent, plus semantic status colors only.
-- Apply roughly 70% neutral / 20% ink / 10% accent by area.
+- Brand palette: deep green shell, green primary actions, bright yellow selective highlights, white work surfaces, near-black text, plus semantic status colors.
+- Apply roughly 60% neutral / 20% ink / 15% green / 5% yellow by area. Yellow is never a large page background or a primary button.
 - Color always pairs with a label, icon, or position — never color alone to convey state (accessibility).
 - Status semantics are fixed project-wide: success, warning, danger, neutral, info. Do not invent a sixth.
 - Borders do the work shadows would. Use one elevation step, not five.
@@ -149,7 +149,7 @@ Do not claim a UI is finished from code alone.
 
 - [ ] One thesis per screen, one focal point.
 - [ ] Typography from the project scale; figures use tabular numerals.
-- [ ] Palette limited to neutrals + one accent + semantic status.
+- [ ] Palette uses green, yellow, white, and near-black deliberately, with semantic status intact.
 - [ ] No banned tells present.
 - [ ] Table alignment, sorting, filtering, and pagination behave.
 - [ ] Loading, empty, error, and filtered-empty states exist.

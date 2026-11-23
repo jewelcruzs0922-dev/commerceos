@@ -2,20 +2,22 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import {
   ArrowRightIcon,
-  ChevronRightIcon,
+  ArrowUpRightIcon,
   DatabaseZapIcon,
-  StoreIcon,
 } from "lucide-react";
+import { PerformanceSummary } from "@/components/app/performance-summary";
 import { PageHeader } from "@/components/app/page-header";
+import { SectionHeading } from "@/components/app/section-heading";
 import {
   StatusPill,
   humanizeStatus,
   toneForStatus,
 } from "@/components/app/status-pill";
-import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
+  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -24,23 +26,21 @@ import {
 import { percentDelta, resolveRange } from "@/features/analytics/lib";
 import { getAnalytics } from "@/features/analytics/queries";
 import { listInventory } from "@/features/inventory/queries";
-import { listOrders } from "@/features/orders/queries";
-import { listReturns } from "@/features/returns/queries";
+import { countOrders, listOrders } from "@/features/orders/queries";
+import { countReturns } from "@/features/returns/queries";
 import { requireMemberContext } from "@/lib/auth/session";
-import { formatDateTime, formatMoney, formatNumber } from "@/lib/format";
+import {
+  formatDate,
+  formatDateTime,
+  formatMoney,
+  formatNumber,
+} from "@/lib/format";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
+import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "Overview",
 };
-
-function deltaLabel(delta: number | null): string {
-  if (delta === null) {
-    return "No prior-period data";
-  }
-  const sign = delta > 0 ? "+" : "";
-  return `${sign}${delta.toFixed(1)}% vs prior 30 days`;
-}
 
 export default async function OverviewPage() {
   if (!isSupabaseConfigured()) {
@@ -49,14 +49,8 @@ export default async function OverviewPage() {
         <PageHeader
           title="Overview"
           description="The operating picture for Urban Goods. Connect Supabase to load live records."
-          status={
-            <Badge variant="outline" className="gap-1 text-muted-foreground">
-              <StoreIcon aria-hidden="true" />
-              Demo workspace
-            </Badge>
-          }
         />
-        <p className="rounded-lg border border-border bg-card px-4 py-3 text-sm text-muted-foreground">
+        <p className="border-y border-border py-4 text-sm text-muted-foreground">
           Supabase credentials are missing, so authentication and store data are
           disabled.
         </p>
@@ -68,12 +62,13 @@ export default async function OverviewPage() {
   const timeZone = context.membership.storeTimezone;
   const range = resolveRange({}, timeZone);
 
-  const [analytics, recentOrders, lowStock, openReturns, pendingOrders] =
+  const [analytics, recentOrders, lowStock, openReturnsCount, pendingOrdersCount] =
     await Promise.all([
       getAnalytics({
         storeId: context.membership.storeId,
         timeZone,
         range,
+        includeProductPerformance: false,
       }),
       listOrders({
         storeId: context.membership.storeId,
@@ -90,37 +85,26 @@ export default async function OverviewPage() {
         page: 1,
         pageSize: 5,
       }),
-      listReturns({
+      countReturns({
         storeId: context.membership.storeId,
-        search: "",
         status: "requested",
-        sort: "newest",
-        page: 1,
-        pageSize: 1,
       }),
-      listOrders({
+      countOrders({
         storeId: context.membership.storeId,
-        filters: {
-          search: "",
-          status: "pending",
-          payment: null,
-          fulfillment: null,
-        },
-        sort: "newest",
-        page: 1,
-        pageSize: 1,
+        status: "pending",
       }),
     ]);
 
-  const metrics = [
-    {
-      label: "Net sales",
-      value: formatMoney(analytics.current.netCents),
-      delta: percentDelta(
-        analytics.current.netCents,
-        analytics.previous.netCents
-      ),
-    },
+  const primaryMetric = {
+    label: "Net sales",
+    value: formatMoney(analytics.current.netCents),
+    delta: percentDelta(
+      analytics.current.netCents,
+      analytics.previous.netCents
+    ),
+  };
+
+  const supportMetrics = [
     {
       label: "Orders",
       value: formatNumber(analytics.current.orders),
@@ -135,7 +119,7 @@ export default async function OverviewPage() {
       ),
     },
     {
-      label: "Average order value",
+      label: "Average order",
       value: formatMoney(analytics.current.averageOrderCents),
       delta: percentDelta(
         analytics.current.averageOrderCents,
@@ -144,99 +128,144 @@ export default async function OverviewPage() {
     },
   ];
 
+  const attentionItems = [
+    {
+      label: "Low-stock variants",
+      context: "Inventory",
+      count: lowStock.total,
+      href: "/inventory?low=1",
+    },
+    {
+      label: "Requested returns",
+      context: "Returns",
+      count: openReturnsCount,
+      href: "/returns?status=requested",
+    },
+    {
+      label: "Pending orders",
+      context: "Orders",
+      count: pendingOrdersCount,
+      href: "/orders?status=pending",
+    },
+  ];
+
   return (
     <div className="flex flex-col gap-8">
       <PageHeader
         title="Overview"
-        description={`The operating picture for ${context.membership.storeName}: the last 30 days (${range.label}), then the records that need attention.`}
-        status={
-          <>
-            <Badge variant="outline" className="gap-1 text-muted-foreground">
-              <StoreIcon aria-hidden="true" />
-              Demo workspace
-            </Badge>
-            {analytics.hasOrders ? (
-              <Badge variant="outline" className="text-muted-foreground">
-                Seeded dataset
-              </Badge>
-            ) : null}
-          </>
+        description={`Last ${range.days.length} days \u00b7 ${range.label} \u00b7 Demo workspace`}
+        actions={
+          <Button asChild variant="outline">
+            <Link href={`/analytics?from=${range.from}&to=${range.to}`}>
+              Open analytics
+              <ArrowUpRightIcon aria-hidden="true" />
+            </Link>
+          </Button>
         }
       />
 
-      <div className="flex flex-wrap items-start gap-3 rounded-lg border border-border bg-card px-4 py-3.5">
-        <DatabaseZapIcon
-          aria-hidden="true"
-          className="mt-0.5 size-4 shrink-0 text-muted-foreground"
-        />
-        <div className="flex min-w-0 flex-col gap-0.5">
-          <p className="text-sm font-medium">
-            {analytics.hasOrders
-              ? "Fictional Urban Goods data, reconciled against seeded records"
-              : "No order records in the last 30 days"}
-          </p>
-          <p className="text-xs leading-5 text-muted-foreground">
-            {analytics.hasOrders
-              ? "All figures are derived from the demo database. No real customers, payments, email, or business performance are represented."
-              : "Create a product and an order, or reset the demo data from Settings, to populate this view."}
-          </p>
-        </div>
-      </div>
+      {!analytics.hasOrders ? (
+        <p className="border-y border-border py-4 text-sm text-muted-foreground">
+          No order records in the last 30 days. Create a product and an order,
+          or reset the demo data from Settings, to populate this view.
+        </p>
+      ) : null}
 
-      <section aria-labelledby="performance-title" className="flex flex-col gap-3">
-        <div className="flex flex-wrap items-end justify-between gap-2">
-          <h2 id="performance-title" className="text-sm font-semibold">
-            Performance · last 30 days
-          </h2>
-          <Link
-            href={`/analytics?from=${range.from}&to=${range.to}`}
-            className="text-xs font-medium text-primary underline-offset-4 hover:underline"
-          >
-            Open analytics
-          </Link>
-        </div>
-        <div className="grid gap-px overflow-hidden rounded-lg border border-border bg-border sm:grid-cols-2 xl:grid-cols-4">
-          {metrics.map((metric) => (
-            <div key={metric.label} className="bg-card p-4">
-              <p className="text-xs font-medium text-muted-foreground">
-                {metric.label}
-              </p>
-              <p className="mt-1.5 font-mono text-[28px] leading-[34px] font-semibold tabular-nums">
-                {metric.value}
-              </p>
-              <p className="mt-1 text-xs text-muted-foreground">
-                {deltaLabel(metric.delta)}
-              </p>
-            </div>
-          ))}
-        </div>
+      <section
+        aria-labelledby="performance-title"
+        className="flex flex-col gap-4"
+      >
+        <SectionHeading
+          id="performance-title"
+          title="Performance"
+          action={
+            <span className="font-mono text-[11px] tabular-nums text-muted-foreground">
+              Compared with prior {range.days.length} days
+            </span>
+          }
+        />
+        <PerformanceSummary
+          primary={{
+            ...primaryMetric,
+            comparison: `vs prior ${range.days.length} days`,
+          }}
+          support={supportMetrics.map((metric) => ({
+            ...metric,
+            comparison: "vs prior",
+          }))}
+        />
       </section>
 
-      <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_20rem]">
+      <div className="grid gap-10 xl:grid-cols-[minmax(0,1fr)_21rem] xl:gap-12">
         <section
           aria-labelledby="recent-orders-title"
-          className="flex min-w-0 flex-col gap-3"
+          className="flex min-w-0 flex-col gap-4"
         >
-          <div className="flex flex-wrap items-end justify-between gap-2">
-            <h2 id="recent-orders-title" className="text-sm font-semibold">
-              Recent orders
-            </h2>
-            <Link
-              href="/orders"
-              className="text-xs font-medium text-primary underline-offset-4 hover:underline"
-            >
-              All orders
-            </Link>
-          </div>
+          <SectionHeading
+            id="recent-orders-title"
+            title="Recent orders"
+            action={
+              <Link
+                href="/orders"
+                className="inline-flex items-center gap-1 text-xs font-medium text-primary underline-offset-4 hover:underline"
+              >
+                View all orders
+                <ArrowRightIcon aria-hidden="true" className="size-3.5" />
+              </Link>
+            }
+          />
           {recentOrders.rows.length === 0 ? (
-            <p className="rounded-lg border border-border bg-card px-4 py-6 text-sm text-muted-foreground">
+            <p className="border-y border-border py-8 text-sm text-muted-foreground">
               No orders yet.
             </p>
           ) : (
-            <div className="overflow-x-auto rounded-lg border border-border">
-              <Table className="min-w-[40rem]">
-                <TableHeader className="bg-muted/60">
-                  <TableRow>
+            <>
+              <ul className="border-y border-border sm:hidden">
+                {recentOrders.rows.map((order) => (
+                  <li
+                    key={order.id}
+                    className="border-b border-border last:border-b-0"
+                  >
+                    <Link
+                      href={`/orders/${order.id}`}
+                      className="flex flex-col gap-2 py-3"
+                    >
+                      <span className="flex items-start justify-between gap-4">
+                        <span className="flex min-w-0 flex-col gap-0.5">
+                          <span className="truncate text-[13px] font-medium leading-5">
+                            {order.customerName || order.email}
+                          </span>
+                          <span className="truncate font-mono text-[11px] leading-4 text-muted-foreground">
+                            {order.orderNumber}
+                          </span>
+                        </span>
+                        <span className="shrink-0 font-mono text-[13px] font-medium tabular-nums">
+                          {formatMoney(order.totalCents)}
+                        </span>
+                      </span>
+                      <span className="flex items-center justify-between gap-4">
+                        <StatusPill
+                          label={humanizeStatus(order.paymentStatus)}
+                          tone={toneForStatus(order.paymentStatus)}
+                        />
+                        <span
+                          className="text-[11px] leading-4 text-muted-foreground"
+                          title={formatDateTime(order.placedAt)}
+                        >
+                          {formatDate(order.placedAt)}
+                        </span>
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+              <div className="ledger-table hidden sm:block">
+                <Table className="min-w-[32rem]">
+                <TableCaption className="sr-only">
+                  Five most recent orders
+                </TableCaption>
+                <TableHeader className="bg-secondary/55">
+                  <TableRow className="hover:bg-transparent">
                     <TableHead scope="col">Order</TableHead>
                     <TableHead scope="col">Payment</TableHead>
                     <TableHead scope="col" className="text-right">
@@ -249,125 +278,128 @@ export default async function OverviewPage() {
                 </TableHeader>
                 <TableBody>
                   {recentOrders.rows.map((order) => (
-                    <TableRow key={order.id} className="h-12">
-                      <TableCell>
-                        <div className="flex min-w-0 flex-col">
-                          <Link
-                            href={`/orders/${order.id}`}
-                            className="font-mono text-xs font-medium underline-offset-4 hover:underline"
-                          >
-                            {order.orderNumber}
-                          </Link>
-                          <span className="truncate text-xs text-muted-foreground">
+                    <TableRow key={order.id} className="h-14">
+                      <TableCell className="px-3 first:pl-0">
+                        <Link
+                          href={`/orders/${order.id}`}
+                          className="group/order flex min-w-0 flex-col gap-0.5 outline-offset-4"
+                        >
+                          <span className="truncate text-[13px] font-medium leading-5 group-hover/order:text-primary">
                             {order.customerName || order.email}
                           </span>
-                        </div>
+                          <span className="truncate font-mono text-[11px] leading-4 text-muted-foreground">
+                            {order.orderNumber}
+                          </span>
+                        </Link>
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="px-3">
                         <StatusPill
                           label={humanizeStatus(order.paymentStatus)}
                           tone={toneForStatus(order.paymentStatus)}
                         />
                       </TableCell>
-                      <TableCell className="text-right font-mono text-xs tabular-nums">
+                      <TableCell className="px-3 text-right font-mono text-[13px] font-medium tabular-nums">
                         {formatMoney(order.totalCents)}
                       </TableCell>
-                      <TableCell className="text-right text-xs text-muted-foreground">
-                        {formatDateTime(order.placedAt)}
+                      <TableCell className="px-3 text-right text-xs text-muted-foreground last:pr-0">
+                        {formatDate(order.placedAt)}
                       </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
-            </div>
+              </div>
+            </>
           )}
         </section>
 
-        <div className="flex min-w-0 flex-col gap-6">
+        <aside className="flex min-w-0 flex-col gap-8 xl:border-l xl:border-border xl:pl-8">
           <section
             aria-labelledby="attention-title"
-            className="flex flex-col gap-3 rounded-lg border border-border bg-card p-4"
+            className="overflow-hidden rounded-xl border border-highlight-border bg-highlight-soft"
           >
-            <div className="flex flex-col gap-0.5">
+            <div className="flex items-center justify-between gap-3 px-4 py-3">
               <h2 id="attention-title" className="text-sm font-semibold">
                 Needs attention
               </h2>
-              <p className="text-xs text-muted-foreground">
-                Counts from the current store.
-              </p>
+              <span className="font-mono text-[11px] tabular-nums text-foreground/75">
+                {attentionItems.length} queues
+              </span>
             </div>
-            <ul className="flex flex-col divide-y divide-border">
-              <li className="flex items-center justify-between gap-3 py-2.5">
-                <Link
-                  href="/inventory?low=1"
-                  className="text-sm underline-offset-4 hover:underline"
-                >
-                  Low-stock variants
-                </Link>
-                <span className="font-mono text-sm tabular-nums">
-                  {formatNumber(lowStock.total)}
-                </span>
-              </li>
-              <li className="flex items-center justify-between gap-3 py-2.5">
-                <Link
-                  href="/returns?status=requested"
-                  className="text-sm underline-offset-4 hover:underline"
-                >
-                  Requested returns
-                </Link>
-                <span className="font-mono text-sm tabular-nums">
-                  {formatNumber(openReturns.total)}
-                </span>
-              </li>
-              <li className="flex items-center justify-between gap-3 py-2.5">
-                <Link
-                  href="/orders?status=pending"
-                  className="text-sm underline-offset-4 hover:underline"
-                >
-                  Pending orders
-                </Link>
-                <span className="font-mono text-sm tabular-nums">
-                  {formatNumber(pendingOrders.total)}
-                </span>
-              </li>
+            <ul className="border-t border-highlight-border/70">
+              {attentionItems.map((item) => (
+                <li key={item.label}>
+                  <Link
+                    href={item.href}
+                    className="group flex items-center justify-between gap-4 border-b border-highlight-border/70 px-4 py-3.5 last:border-0 hover:bg-highlight/25"
+                  >
+                    <span className="flex min-w-0 flex-col gap-0.5">
+                      <span className="text-[13px] font-medium leading-5">
+                        {item.label}
+                      </span>
+                      <span className="text-[11px] leading-4 text-foreground/75">
+                        {item.context}
+                      </span>
+                    </span>
+                    <span className="flex shrink-0 items-center gap-3">
+                      <span className="font-mono text-2xl font-semibold leading-8 tabular-nums">
+                        {formatNumber(item.count)}
+                      </span>
+                      <ArrowRightIcon
+                        aria-hidden="true"
+                        className="size-4 text-foreground/45 transition-colors group-hover:text-foreground"
+                      />
+                    </span>
+                  </Link>
+                </li>
+              ))}
             </ul>
           </section>
 
-          <section
-            aria-labelledby="low-stock-title"
-            className="flex flex-col gap-2 rounded-lg border border-border bg-card p-4"
-          >
-            <div className="flex items-center justify-between gap-2">
-              <h2 id="low-stock-title" className="text-sm font-semibold">
-                Low stock
-              </h2>
-              <Link
-                href="/inventory?low=1"
-                className="text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
-              >
-                View
-              </Link>
-            </div>
+          <section aria-labelledby="low-stock-title">
+            <SectionHeading
+              id="low-stock-title"
+              title="Low stock"
+              action={
+                <Link
+                  href="/inventory?low=1"
+                  className="inline-flex items-center gap-1 text-xs font-medium text-primary underline-offset-4 hover:underline"
+                >
+                  View all
+                  <ArrowRightIcon aria-hidden="true" className="size-3.5" />
+                </Link>
+              }
+            />
             {lowStock.rows.length === 0 ? (
-              <p className="py-2 text-xs text-muted-foreground">
+              <p className="mt-4 border-y border-border py-5 text-xs text-muted-foreground">
                 No variants are below threshold.
               </p>
             ) : (
-              <ul className="flex flex-col divide-y divide-border">
+              <ul className="mt-4 border-t border-border">
                 {lowStock.rows.map((item) => (
                   <li key={item.variantId}>
                     <Link
                       href={`/inventory/${item.variantId}`}
-                      className="flex items-center justify-between gap-3 py-2.5 text-sm outline-none hover:text-primary focus-visible:ring-2 focus-visible:ring-ring"
+                      className="flex items-center justify-between gap-4 border-b border-border py-2.5"
                     >
-                      <span className="flex min-w-0 flex-col">
-                        <span className="truncate">{item.productTitle}</span>
-                        <span className="truncate text-[11px] text-muted-foreground">
-                          {item.variantTitle} ·{" "}
+                      <span className="flex min-w-0 flex-col gap-0.5">
+                        <span className="truncate text-[13px] font-medium leading-5">
+                          {item.productTitle}
+                        </span>
+                        <span className="truncate text-[11px] leading-4 text-muted-foreground">
+                          {item.variantTitle}
+                          <span aria-hidden="true"> · </span>
                           <span className="font-mono">{item.sku}</span>
                         </span>
                       </span>
-                      <span className="shrink-0 font-mono text-xs tabular-nums">
+                      <span
+                        className={cn(
+                          "shrink-0 font-mono text-xs tabular-nums",
+                          item.available === 0
+                            ? "text-danger"
+                            : "text-muted-foreground"
+                        )}
+                      >
                         {formatNumber(item.available)} left
                       </span>
                     </Link>
@@ -376,66 +408,39 @@ export default async function OverviewPage() {
               </ul>
             )}
           </section>
-
-          <section
-            aria-labelledby="environment-title"
-            className="flex flex-col gap-3 rounded-lg border border-border bg-card p-4"
-          >
-            <h2 id="environment-title" className="text-sm font-semibold">
-              Environment
-            </h2>
-            <dl className="flex flex-col gap-2 text-xs">
-              {[
-                { label: "Store", value: context.membership.storeName },
-                { label: "Timezone", value: context.membership.storeTimezone },
-                { label: "Currency", value: context.membership.storeCurrency },
-                { label: "Data", value: "Fictional demo" },
-                { label: "Payments", value: "Not enabled" },
-              ].map((entry) => (
-                <div
-                  key={entry.label}
-                  className="flex items-baseline justify-between gap-3"
-                >
-                  <dt className="text-muted-foreground">{entry.label}</dt>
-                  <dd className="text-right font-medium">{entry.value}</dd>
-                </div>
-              ))}
-            </dl>
-            <Link
-              href="/reports"
-              className="mt-1 inline-flex items-center gap-1 border-t border-border pt-3 text-xs font-medium text-primary underline-offset-4 hover:underline"
-            >
-              Integrity and reports
-              <ArrowRightIcon aria-hidden="true" className="size-3.5" />
-            </Link>
-          </section>
-        </div>
+        </aside>
       </div>
 
-      <nav
-        aria-label="Module shortcuts"
-        className="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-border pt-4 text-xs text-muted-foreground"
-      >
-        {[
-          { href: "/products", label: "Products" },
-          { href: "/orders", label: "Orders" },
-          { href: "/customers", label: "Customers" },
-          { href: "/inventory", label: "Inventory" },
-          { href: "/analytics", label: "Analytics" },
-          { href: "/discounts", label: "Discounts" },
-          { href: "/returns", label: "Returns" },
-          { href: "/team", label: "Team" },
-        ].map((item) => (
+      <footer className="flex flex-col gap-3 border-t border-border pt-4 text-xs text-muted-foreground sm:flex-row sm:items-start sm:justify-between">
+        <p className="flex max-w-lg items-start gap-2 leading-5">
+          <DatabaseZapIcon
+            aria-hidden="true"
+            className="mt-0.5 size-3.5 shrink-0"
+          />
+          Fictional demo data. No real customers, payments, or email.
+        </p>
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+          <dl className="flex flex-wrap items-center gap-x-4 gap-y-1">
+            {[
+              { label: "Store", value: context.membership.storeName },
+              { label: "Timezone", value: context.membership.storeTimezone },
+              { label: "Currency", value: context.membership.storeCurrency },
+              { label: "Payments", value: "Not enabled" },
+            ].map((entry) => (
+              <div key={entry.label} className="flex items-center gap-1">
+                <dt>{entry.label}</dt>
+                <dd className="font-medium text-foreground">{entry.value}</dd>
+              </div>
+            ))}
+          </dl>
           <Link
-            key={item.href}
-            href={item.href}
-            className="inline-flex items-center gap-0.5 underline-offset-4 hover:text-foreground hover:underline"
+            href="/reports"
+            className="font-medium text-primary underline-offset-4 hover:underline"
           >
-            {item.label}
-            <ChevronRightIcon aria-hidden="true" className="size-3" />
+            Integrity reports
           </Link>
-        ))}
-      </nav>
+        </div>
+      </footer>
     </div>
   );
 }

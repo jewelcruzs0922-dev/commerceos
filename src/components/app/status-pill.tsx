@@ -1,14 +1,12 @@
-import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
 const toneClasses = {
-  success: "border-success/30 bg-success-surface text-success",
-  warning: "border-warning/30 bg-warning-surface text-warning",
-  danger: "border-danger/30 bg-danger-surface text-danger",
-  info: "border-info/30 bg-info-surface text-info",
-  neutral:
-    "border-neutral-status/30 bg-neutral-status-surface text-neutral-status",
-  brand: "border-primary/30 bg-primary/10 text-primary",
+  success: "text-success",
+  warning: "text-warning",
+  danger: "text-danger",
+  info: "text-info",
+  neutral: "text-muted-foreground",
+  brand: "text-primary",
 } as const;
 
 export type StatusTone = keyof typeof toneClasses;
@@ -23,12 +21,15 @@ export function StatusPill({
   className?: string;
 }) {
   return (
-    <Badge
-      variant="outline"
-      className={cn("capitalize", toneClasses[tone], className)}
+    <span
+      className={cn(
+        "inline-flex items-center text-[13px] font-semibold",
+        toneClasses[tone],
+        className
+      )}
     >
-      {label}
-    </Badge>
+      <span className="first-letter:uppercase">{label}</span>
+    </span>
   );
 }
 

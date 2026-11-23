@@ -10,18 +10,18 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
         <Link
           href="/login"
           aria-label="CommerceOS sign in"
-          className="w-fit rounded-md outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="w-fit rounded-md outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring [&_path:last-child]:text-sidebar-ring"
         >
           <Wordmark />
         </Link>
 
         <div className="flex max-w-sm flex-col gap-4">
-          <h1 className="text-2xl leading-8 font-semibold tracking-tight">
-            Operations, without the noise.
+          <h1 className="text-[28px] leading-9 font-semibold tracking-tight text-sidebar-foreground">
+            Urban Goods operations
           </h1>
-          <p className="text-sm leading-6 text-muted-foreground">
-            CommerceOS is the internal workspace for Urban Goods: catalog,
-            orders, inventory, customers, and the numbers that connect them.
+          <p className="text-sm leading-6 text-sidebar-foreground/75">
+            Catalog, orders, inventory, customers, and reporting in one internal
+            workspace.
           </p>
           <ul className="flex flex-col gap-1.5">
             {navGroups.map((group) => (
@@ -32,7 +32,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
                 <span className="font-medium text-sidebar-foreground">
                   {group.label}
                 </span>
-                <span className="text-right text-muted-foreground">
+                <span className="text-right text-sidebar-foreground/90">
                   {group.items.map((item) => item.label).join(" · ")}
                 </span>
               </li>
@@ -40,12 +40,12 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
           </ul>
         </div>
 
-        <p className="text-[11px] leading-4 text-muted-foreground">
+        <p className="text-[11px] leading-4 text-sidebar-foreground/90">
           Fictional demo data. No real payments, checkout, or customer email.
         </p>
       </aside>
 
-      <main className="flex min-w-0 flex-col">
+      <main className="flex min-w-0 flex-col bg-card">
         <header className="flex h-14 shrink-0 items-center justify-between border-b border-border px-4 lg:hidden">
           <Link
             href="/login"

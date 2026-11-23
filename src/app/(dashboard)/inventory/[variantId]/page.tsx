@@ -77,7 +77,7 @@ export default async function InventoryDetailPage({
         }
       />
 
-      <div className="grid gap-px overflow-hidden rounded-lg border border-border bg-border sm:grid-cols-2 xl:grid-cols-4">
+      <div className="stat-strip grid grid-cols-2 gap-px border-y border-border bg-border xl:grid-cols-4">
         {[
           { label: "On hand", value: item.onHand },
           { label: "Reserved", value: item.reserved },
@@ -110,13 +110,13 @@ export default async function InventoryDetailPage({
           </div>
 
           {movements.length === 0 ? (
-            <p className="rounded-lg border border-dashed border-border bg-card px-4 py-8 text-center text-sm text-muted-foreground">
+            <p className="border-y border-dashed border-border py-8 text-center text-sm text-muted-foreground">
               No stock movements have been recorded for this variant yet.
             </p>
           ) : (
-            <div className="overflow-hidden rounded-lg border border-border">
+            <div className="ledger-table">
               <Table className="min-w-[36rem]">
-                <TableHeader className="bg-muted/60">
+                <TableHeader className="bg-secondary/55">
                   <TableRow>
                     <TableHead scope="col">When</TableHead>
                     <TableHead scope="col" className="text-right">
@@ -157,7 +157,7 @@ export default async function InventoryDetailPage({
         {canAdjust ? (
           <section
             aria-labelledby="adjust-title"
-            className="flex h-fit flex-col gap-4 rounded-lg border border-border bg-card p-4"
+            className="flex h-fit flex-col gap-4 border-t border-border pt-4"
           >
             <div className="flex flex-col gap-0.5">
               <h2 id="adjust-title" className="text-sm font-semibold">
@@ -171,7 +171,7 @@ export default async function InventoryDetailPage({
             <AdjustmentForm variantId={item.variantId} />
           </section>
         ) : (
-          <p className="rounded-lg border border-border bg-card px-4 py-3 text-xs leading-5 text-muted-foreground">
+          <p className="border-y border-border py-3 text-xs leading-5 text-muted-foreground">
             Demo viewer sessions are read-only. Inventory adjustments are
             disabled.
           </p>

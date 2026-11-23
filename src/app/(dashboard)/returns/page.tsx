@@ -5,9 +5,9 @@ import { BackendRequired } from "@/components/app/backend-required";
 import { EmptyList } from "@/components/app/empty-list";
 import { ListToolbar } from "@/components/app/list-toolbar";
 import { PageHeader } from "@/components/app/page-header";
+import { RecordCount } from "@/components/app/record-count";
 import { Pagination } from "@/components/app/pagination";
 import { StatusPill, humanizeStatus, toneForStatus } from "@/components/app/status-pill";
-import { Badge } from "@/components/ui/badge";
 import {
   Table,
   TableBody,
@@ -17,7 +17,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { requireMemberContext } from "@/lib/auth/session";
-import { formatDateTime, formatMoney, formatNumber } from "@/lib/format";
+import { formatDateTime, formatMoney } from "@/lib/format";
 import { parsePage, sanitizeSearch } from "@/lib/list-params";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { listReturns } from "@/features/returns/queries";
@@ -81,11 +81,9 @@ export default async function ReturnsPage({
     <div className="flex flex-col gap-6">
       <PageHeader
         title="Returns"
-        description="A requested return is reviewed, approved or rejected, then refunded separately. Restocking happens once, on refund."
+        description="Request, review, refund. Restocking happens once, on refund."
         status={
-          <Badge variant="outline" className="font-mono text-[11px]">
-            {formatNumber(total)}
-          </Badge>
+          <RecordCount value={total} label="returns" />
         }
       />
 
@@ -129,21 +127,21 @@ export default async function ReturnsPage({
         />
       ) : (
         <>
-          <div className="overflow-hidden rounded-lg border border-border">
-            <Table className="min-w-[48rem]">
-              <TableHeader className="bg-muted/60">
+          <div className="ledger-table">
+            <Table className="min-w-0 sm:min-w-[32rem] lg:min-w-[48rem]">
+              <TableHeader className="bg-secondary/55">
                 <TableRow>
                   <TableHead scope="col">Return</TableHead>
-                  <TableHead scope="col">Order</TableHead>
-                  <TableHead scope="col">Customer</TableHead>
-                  <TableHead scope="col" className="text-right">
+                  <TableHead scope="col" className="hidden sm:table-cell">Order</TableHead>
+                  <TableHead scope="col" className="hidden lg:table-cell">Customer</TableHead>
+                  <TableHead scope="col" className="hidden text-right md:table-cell">
                     Items
                   </TableHead>
                   <TableHead scope="col" className="text-right">
                     Refund value
                   </TableHead>
                   <TableHead scope="col">Status</TableHead>
-                  <TableHead scope="col" className="text-right">
+                  <TableHead scope="col" className="hidden text-right sm:table-cell">
                     Requested
                   </TableHead>
                 </TableRow>
@@ -159,13 +157,13 @@ export default async function ReturnsPage({
                         RET-{ret.id.slice(0, 8)}
                       </Link>
                     </TableCell>
-                    <TableCell className="font-mono text-xs">
+                    <TableCell className="hidden font-mono text-xs sm:table-cell">
                       {ret.orderNumber}
                     </TableCell>
-                    <TableCell className="text-xs">
+                    <TableCell className="hidden text-xs lg:table-cell">
                       {ret.customerName || "—"}
                     </TableCell>
-                    <TableCell className="text-right font-mono text-xs tabular-nums">
+                    <TableCell className="hidden text-right font-mono text-xs tabular-nums md:table-cell">
                       {ret.itemCount}
                     </TableCell>
                     <TableCell className="text-right font-mono text-xs tabular-nums">
@@ -177,7 +175,7 @@ export default async function ReturnsPage({
                         tone={toneForStatus(ret.status)}
                       />
                     </TableCell>
-                    <TableCell className="text-right text-xs text-muted-foreground">
+                    <TableCell className="hidden text-right text-xs text-muted-foreground sm:table-cell">
                       {formatDateTime(ret.createdAt)}
                     </TableCell>
                   </TableRow>

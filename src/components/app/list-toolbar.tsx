@@ -129,7 +129,10 @@ export function ListToolbar({
           <SelectTrigger
             size="sm"
             aria-label={filter.label}
-            className="w-auto min-w-[8.5rem]"
+            className={cn(
+              "w-auto min-w-[8.5rem] border-transparent bg-transparent hover:bg-muted/40 hover:text-foreground",
+              filter.value ? "text-foreground" : "text-muted-foreground"
+            )}
           >
             <SelectValue placeholder={filter.label} />
           </SelectTrigger>
@@ -151,7 +154,7 @@ export function ListToolbar({
           <SelectTrigger
             size="sm"
             aria-label={sort.label}
-            className="w-auto min-w-[9.5rem]"
+            className="w-auto min-w-[9.5rem] border-transparent bg-transparent text-muted-foreground hover:bg-muted/40 hover:text-foreground"
           >
             <SelectValue />
           </SelectTrigger>

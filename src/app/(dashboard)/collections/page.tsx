@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { PlusIcon } from "lucide-react";
+import { Layers, PlusIcon } from "lucide-react";
 import { z } from "zod";
 import { BackendRequired } from "@/components/app/backend-required";
 import { EmptyList } from "@/components/app/empty-list";
 import { ListToolbar } from "@/components/app/list-toolbar";
 import { PageHeader } from "@/components/app/page-header";
+import { RecordCount } from "@/components/app/record-count";
 import { Pagination } from "@/components/app/pagination";
 import { StatusPill, toneForStatus } from "@/components/app/status-pill";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -19,7 +19,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { requireMemberContext } from "@/lib/auth/session";
-import { formatDate, formatNumber } from "@/lib/format";
+import { formatDate } from "@/lib/format";
 import { parsePage, sanitizeSearch } from "@/lib/list-params";
 import { can } from "@/lib/permissions";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
@@ -82,11 +82,9 @@ export default async function CollectionsPage({
     <div className="flex flex-col gap-6">
       <PageHeader
         title="Collections"
-        description="Curated groups of products used to organize the catalog."
+        description="Product groups used to organize the catalog."
         status={
-          <Badge variant="outline" className="font-mono text-[11px]">
-            {formatNumber(total)}
-          </Badge>
+          <RecordCount value={total} label="collections" />
         }
         actions={
           canManage ? (
@@ -151,37 +149,53 @@ export default async function CollectionsPage({
         />
       ) : (
         <>
-          <div className="overflow-hidden rounded-lg border border-border">
-            <Table className="min-w-[42rem]">
-              <TableHeader className="bg-muted/60">
+          <div className="ledger-table">
+            <Table className="min-w-0 sm:min-w-[32rem] lg:min-w-[44rem]">
+              <TableHeader className="bg-secondary/55">
                 <TableRow>
                   <TableHead scope="col">Collection</TableHead>
-                  <TableHead scope="col">Status</TableHead>
+                  <TableHead scope="col" className="hidden sm:table-cell">
+                    Status
+                  </TableHead>
                   <TableHead scope="col" className="text-right">
                     Products
                   </TableHead>
-                  <TableHead scope="col" className="text-right">
-                    Created
+                  <TableHead scope="col" className="hidden text-right sm:table-cell">
+                    Updated
                   </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {rows.map((collection) => (
                   <TableRow key={collection.id} className="h-14">
-                    <TableCell>
-                      <div className="flex min-w-0 flex-col">
-                        <Link
-                          href={`/collections/${collection.id}/edit`}
-                          className="truncate font-medium underline-offset-4 hover:underline"
+                    <TableCell className="max-w-[13rem] sm:max-w-none">
+                      <div className="flex items-center gap-3">
+                        <span
+                          aria-hidden="true"
+                          className="flex size-9 shrink-0 items-center justify-center rounded-md bg-secondary text-primary"
                         >
-                          {collection.title}
-                        </Link>
-                        <span className="truncate text-xs text-muted-foreground">
-                          {collection.description || collection.slug}
+                          <Layers className="size-4" />
                         </span>
+                        <div className="flex min-w-0 flex-col">
+                          <Link
+                            href={`/collections/${collection.id}/edit`}
+                            className="truncate font-medium underline-offset-4 hover:underline"
+                          >
+                            {collection.title}
+                          </Link>
+                          <span className="truncate font-mono text-[11px] leading-4 text-muted-foreground">
+                            {collection.slug}
+                          </span>
+                          <span className="mt-1 sm:hidden">
+                            <StatusPill
+                              label={collection.status}
+                              tone={toneForStatus(collection.status)}
+                            />
+                          </span>
+                        </div>
                       </div>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="hidden sm:table-cell">
                       <StatusPill
                         label={collection.status}
                         tone={toneForStatus(collection.status)}
@@ -190,8 +204,8 @@ export default async function CollectionsPage({
                     <TableCell className="text-right font-mono text-xs tabular-nums">
                       {collection.productCount}
                     </TableCell>
-                    <TableCell className="text-right text-xs text-muted-foreground">
-                      {formatDate(collection.created_at)}
+                    <TableCell className="hidden text-right text-xs text-muted-foreground sm:table-cell">
+                      {formatDate(collection.updated_at)}
                     </TableCell>
                   </TableRow>
                 ))}

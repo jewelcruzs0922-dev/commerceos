@@ -6,13 +6,13 @@ import { BackendRequired } from "@/components/app/backend-required";
 import { EmptyList } from "@/components/app/empty-list";
 import { ListToolbar } from "@/components/app/list-toolbar";
 import { PageHeader } from "@/components/app/page-header";
+import { RecordCount } from "@/components/app/record-count";
 import { Pagination } from "@/components/app/pagination";
 import {
   StatusPill,
   humanizeStatus,
   toneForStatus,
 } from "@/components/app/status-pill";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -23,7 +23,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { requireMemberContext } from "@/lib/auth/session";
-import { formatDateTime, formatMoney, formatNumber } from "@/lib/format";
+import { formatDateTime, formatMoney } from "@/lib/format";
 import { parsePage, sanitizeSearch } from "@/lib/list-params";
 import { can } from "@/lib/permissions";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
@@ -119,11 +119,9 @@ export default async function OrdersPage({
     <div className="flex flex-col gap-6">
       <PageHeader
         title="Orders"
-        description="Line items are historical snapshots. Cancellation and refunds are demo bookkeeping, not real payment operations."
+        description="Line items are historical snapshots; refunds are demo bookkeeping."
         status={
-          <Badge variant="outline" className="font-mono text-[11px]">
-            {formatNumber(total)}
-          </Badge>
+          <RecordCount value={total} label="orders" />
         }
         actions={
           <>
@@ -212,20 +210,20 @@ export default async function OrdersPage({
         />
       ) : (
         <>
-          <div className="overflow-hidden rounded-lg border border-border">
-            <Table className="min-w-[52rem]">
-              <TableHeader className="bg-muted/60">
+          <div className="ledger-table">
+            <Table className="min-w-0 sm:min-w-[32rem] lg:min-w-[52rem]">
+              <TableHeader className="bg-secondary/55">
                 <TableRow>
                   <TableHead scope="col">Order</TableHead>
-                  <TableHead scope="col">Payment</TableHead>
-                  <TableHead scope="col">Fulfillment</TableHead>
-                  <TableHead scope="col" className="text-right">
+                  <TableHead scope="col" className="hidden sm:table-cell">Payment</TableHead>
+                  <TableHead scope="col" className="hidden md:table-cell">Fulfillment</TableHead>
+                  <TableHead scope="col" className="hidden text-right lg:table-cell">
                     Items
                   </TableHead>
                   <TableHead scope="col" className="text-right">
                     Total
                   </TableHead>
-                  <TableHead scope="col" className="text-right">
+                  <TableHead scope="col" className="hidden text-right sm:table-cell">
                     Placed
                   </TableHead>
                 </TableRow>
@@ -244,27 +242,33 @@ export default async function OrdersPage({
                         <span className="truncate text-xs text-muted-foreground">
                           {order.customerName || order.email}
                         </span>
+                        <span className="mt-1 sm:hidden">
+                          <StatusPill
+                            label={humanizeStatus(order.paymentStatus)}
+                            tone={toneForStatus(order.paymentStatus)}
+                          />
+                        </span>
                       </div>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="hidden sm:table-cell">
                       <StatusPill
                         label={humanizeStatus(order.paymentStatus)}
                         tone={toneForStatus(order.paymentStatus)}
                       />
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="hidden md:table-cell">
                       <StatusPill
                         label={humanizeStatus(order.fulfillmentStatus)}
                         tone={toneForStatus(order.fulfillmentStatus)}
                       />
                     </TableCell>
-                    <TableCell className="text-right font-mono text-xs tabular-nums">
+                    <TableCell className="hidden text-right font-mono text-xs tabular-nums lg:table-cell">
                       {order.itemCount}
                     </TableCell>
                     <TableCell className="text-right font-mono text-xs tabular-nums">
                       {formatMoney(order.totalCents)}
                     </TableCell>
-                    <TableCell className="text-right text-xs text-muted-foreground">
+                    <TableCell className="hidden text-right text-xs text-muted-foreground sm:table-cell">
                       {formatDateTime(order.placedAt)}
                     </TableCell>
                   </TableRow>

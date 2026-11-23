@@ -8,7 +8,6 @@ import { GlobalSearch } from "@/components/layout/global-search";
 import { NotificationMenu } from "@/components/layout/notification-menu";
 import { ProfileMenu } from "@/components/layout/profile-menu";
 import { StoreSelector } from "@/components/layout/store-selector";
-import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import type { NotificationSummary } from "@/features/notifications/types";
 import type { MemberRole } from "@/lib/permissions";
@@ -29,7 +28,7 @@ export function Topbar({
   notifications: NotificationSummary;
 }) {
   return (
-    <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center gap-2 border-b border-border bg-background px-3 sm:px-6 lg:px-8">
+    <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center gap-2 border-b border-border bg-card px-3 sm:px-6 lg:px-8">
       <Button
         ref={menuButtonRef}
         variant="ghost"
@@ -57,7 +56,6 @@ export function Topbar({
           items={notifications.items}
           unreadCount={notifications.unreadCount}
         />
-        <ThemeToggle />
         <ProfileMenu account={account} backendConnected={backendConnected} />
       </div>
     </header>

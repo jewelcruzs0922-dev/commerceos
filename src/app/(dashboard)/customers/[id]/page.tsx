@@ -64,7 +64,7 @@ export default async function CustomerDetailPage({
         }
       />
 
-      <div className="grid gap-px overflow-hidden rounded-lg border border-border bg-border sm:grid-cols-2 xl:grid-cols-4">
+      <div className="stat-strip grid grid-cols-2 gap-px border-y border-border bg-border xl:grid-cols-4">
         {[
           { label: "Orders", value: formatNumber(summary.orderCount) },
           { label: "Total spend", value: formatMoney(summary.spendCents) },
@@ -106,13 +106,13 @@ export default async function CustomerDetailPage({
             </div>
 
             {orders.length === 0 ? (
-              <p className="rounded-lg border border-dashed border-border bg-card px-4 py-8 text-center text-sm text-muted-foreground">
+              <p className="border-y border-dashed border-border py-8 text-center text-sm text-muted-foreground">
                 This customer has no orders yet.
               </p>
             ) : (
-              <div className="overflow-hidden rounded-lg border border-border">
+              <div className="ledger-table">
                 <Table className="min-w-[38rem]">
-                  <TableHeader className="bg-muted/60">
+                  <TableHeader className="bg-secondary/55">
                     <TableRow>
                       <TableHead scope="col">Order</TableHead>
                       <TableHead scope="col">Placed</TableHead>
@@ -168,7 +168,7 @@ export default async function CustomerDetailPage({
               Addresses
             </h2>
             {addresses.length === 0 ? (
-              <p className="rounded-lg border border-dashed border-border bg-card px-4 py-6 text-sm text-muted-foreground">
+              <p className="border-y border-dashed border-border py-6 text-sm text-muted-foreground">
                 No addresses on file.
               </p>
             ) : (
@@ -206,7 +206,7 @@ export default async function CustomerDetailPage({
 
         <section
           aria-labelledby="profile-title"
-          className="flex h-fit flex-col gap-4 rounded-lg border border-border bg-card p-4"
+          className="flex h-fit flex-col gap-4 border-t border-border pt-4"
         >
           <div className="flex flex-col gap-0.5">
             <h2 id="profile-title" className="text-sm font-semibold">

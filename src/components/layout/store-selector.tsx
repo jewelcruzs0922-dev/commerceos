@@ -29,7 +29,7 @@ export function StoreSelector({ storeName }: { storeName: string }) {
           <span className="truncate">{storeName}</span>
           <Badge
             variant="outline"
-            className="border-primary/30 bg-primary/10 px-1.5 text-[10px] text-primary"
+            className="border-highlight-border bg-highlight px-1.5 text-[10px] font-semibold text-highlight-foreground"
           >
             Demo
           </Badge>

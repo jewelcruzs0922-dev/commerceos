@@ -22,8 +22,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { BrandMark, Wordmark } from "@/components/brand/wordmark";
-import { ThemeToggle } from "@/components/theme-toggle";
-import { Badge } from "@/components/ui/badge";
+import { StatusPill, toneForStatus } from "@/components/app/status-pill";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -101,65 +100,72 @@ const coreColors = [
   {
     role: "Background",
     token: "--background",
-    light: "#F7F8F5",
-    dark: "#0B110E",
-    use: "Page surface",
+    light: "#F7F9F6",
+    dark: "#0B110D",
+    use: "Page canvas",
   },
   {
     role: "Foreground",
     token: "--foreground",
-    light: "#14201A",
-    dark: "#E9EFEA",
+    light: "#171C19",
+    dark: "#EEF6F0",
     use: "Primary text",
   },
   {
     role: "Card",
     token: "--card",
     light: "#FFFFFF",
-    dark: "#111915",
-    use: "Discrete objects only",
+    dark: "#121A15",
+    use: "Work surface",
   },
   {
     role: "Muted",
     token: "--muted",
-    light: "#EFF2EE",
-    dark: "#18241D",
+    light: "#F1F5F1",
+    dark: "#15231A",
     use: "Table headers, sunken rows",
   },
   {
     role: "Muted text",
     token: "--muted-foreground",
-    light: "#5A6860",
-    dark: "#A0ADA5",
+    light: "#626B65",
+    dark: "#A7B8AD",
     use: "Secondary text, labels",
   },
   {
     role: "Border",
     token: "--border",
-    light: "#E1E6E0",
-    dark: "#26352C",
+    light: "#E1E7E2",
+    dark: "#26362C",
     use: "Rules and dividers",
   },
   {
     role: "Input",
     token: "--input",
-    light: "#89968E",
-    dark: "#5D7164",
+    light: "#78857C",
+    dark: "#647A6C",
     use: "Field boundaries",
   },
   {
     role: "Primary",
     token: "--primary",
-    light: "#0B6B4B",
-    dark: "#34C08A",
-    use: "Action, active location",
+    light: "#16834A",
+    dark: "#4ADE80",
+    use: "Action, selected state",
   },
   {
     role: "Accent",
     token: "--accent",
-    light: "#E7F0EA",
-    dark: "#1A2C24",
+    light: "#E7F5EC",
+    dark: "#183323",
     use: "Hover, selection",
+  },
+  {
+    role: "Highlight",
+    token: "--highlight",
+    light: "#F4D531",
+    dark: "#F4D531",
+    use: "Demo, attention, one chart series",
   },
   {
     role: "Destructive",
@@ -171,24 +177,24 @@ const coreColors = [
   {
     role: "Ring",
     token: "--ring",
-    light: "#0B6B4B",
-    dark: "#34C08A",
+    light: "#16834A",
+    dark: "#4ADE80",
     use: "Focus",
   },
   {
     role: "Sidebar",
     token: "--sidebar",
-    light: "#FBFCFA",
-    dark: "#0F1713",
+    light: "#0E6038",
+    dark: "#0A3622",
     use: "Application shell",
   },
 ] as const;
 
 const chartSeries = [
-  { label: "Series 1", light: "#0B6B4B", dark: "#34C08A", note: "Revenue" },
-  { label: "Series 2", light: "#2B5B85", dark: "#7BB2DE", note: "Orders" },
-  { label: "Series 3", light: "#8A5A12", dark: "#D8A657", note: "Refunds" },
-  { label: "Series 4", light: "#5A6860", dark: "#A0ADA5", note: "Comparison" },
+  { label: "Series 1", light: "#16834A", dark: "#4ADE80", note: "Revenue" },
+  { label: "Series 2", light: "#B38600", dark: "#F4D531", note: "Orders" },
+  { label: "Series 3", light: "#0E6038", dark: "#2BB673", note: "Refunds" },
+  { label: "Series 4", light: "#626B65", dark: "#A7B8AD", note: "Comparison" },
 ] as const;
 
 const iconSamples = [
@@ -199,19 +205,6 @@ const iconSamples = [
   { icon: ChartNoAxesColumnIcon, label: "Analytics" },
   { icon: SettingsIcon, label: "Settings" },
 ] as const;
-
-const paymentTone: Record<string, string> = {
-  Paid: "border-success/30 bg-success-surface text-success",
-  Pending: "border-warning/30 bg-warning-surface text-warning",
-  Refunded: "border-danger/30 bg-danger-surface text-danger",
-};
-
-const fulfillmentTone: Record<string, string> = {
-  Fulfilled: "border-success/30 bg-success-surface text-success",
-  "In transit": "border-info/30 bg-info-surface text-info",
-  Returned: "border-danger/30 bg-danger-surface text-danger",
-  Unfulfilled: "border-neutral-status/30 bg-neutral-status-surface text-neutral-status",
-};
 
 const specimenRows = [
   {
@@ -312,7 +305,6 @@ export function DesignShowcase() {
               Design system
             </span>
           </div>
-          <ThemeToggle />
         </div>
       </header>
 
@@ -323,13 +315,14 @@ export function DesignShowcase() {
       >
         <div className="flex max-w-2xl flex-col gap-3">
           <h1 className="text-[32px] leading-10 font-semibold tracking-tight">
-            Quiet operations
+            CommerceOS visual system
           </h1>
           <p className="text-sm leading-6 text-muted-foreground">
-            The visual reference for CommerceOS. Emerald marks the action and
-            the current location; everything else stays neutral so figures and
-            status carry the signal. Geist for interface text, Geist Mono for
-            identifiers and amounts.
+            Green carries the brand, primary actions, and selected navigation.
+            Yellow is reserved for demo state, attention, and one highlighted
+            chart series. White work surfaces and near-black type keep dense
+            operational screens readable. Geist for interface text, Geist Mono
+            for identifiers and amounts.
           </p>
           <p className="text-xs text-muted-foreground">
             Phase 2 reference route. No store records, no navigation shell, no
@@ -409,7 +402,7 @@ export function DesignShowcase() {
                 </p>
                 <p>
                   The ledger rule is the only colored element; it must use the
-                  emerald token, never an arbitrary green.
+                  primary green token, never an arbitrary green.
                 </p>
                 <p>
                   In one color the mark keeps its shape. Test it on ink and on
@@ -427,7 +420,7 @@ export function DesignShowcase() {
           <SectionHeading
             id="color-title"
             title="Color"
-            description="Neutral surfaces, ink text, one accent. Values below mirror the tokens in globals.css."
+            description="Green, yellow, white, and near-black roles. Values below mirror the tokens in globals.css."
           />
           <div className="overflow-hidden rounded-lg border border-border">
             <Table className="min-w-[720px]">
@@ -475,41 +468,16 @@ export function DesignShowcase() {
           <div className="grid gap-6 lg:grid-cols-2">
             <div className="flex flex-col gap-4">
               <h3 className="text-sm font-semibold">Status</h3>
-              <div className="flex flex-wrap items-center gap-2">
-                <Badge
-                  variant="outline"
-                  className="border-success/30 bg-success-surface text-success"
-                >
-                  Paid
-                </Badge>
-                <Badge
-                  variant="outline"
-                  className="border-warning/30 bg-warning-surface text-warning"
-                >
-                  Pending
-                </Badge>
-                <Badge
-                  variant="outline"
-                  className="border-danger/30 bg-danger-surface text-danger"
-                >
-                  Refunded
-                </Badge>
-                <Badge
-                  variant="outline"
-                  className="border-info/30 bg-info-surface text-info"
-                >
-                  In transit
-                </Badge>
-                <Badge
-                  variant="outline"
-                  className="border-neutral-status/30 bg-neutral-status-surface text-neutral-status"
-                >
-                  Draft
-                </Badge>
+              <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+                <StatusPill label="Paid" tone="success" />
+                <StatusPill label="Pending" tone="warning" />
+                <StatusPill label="Refunded" tone="danger" />
+                <StatusPill label="In transit" tone="info" />
+                <StatusPill label="Draft" tone="neutral" />
               </div>
               <p className="text-xs leading-5 text-muted-foreground">
-                Status never relies on color alone. Every chip carries a label,
-                and controls pair an icon with text.
+                Status never relies on color alone. Every state carries a label
+                and a ledger tick; controls pair an icon with text.
               </p>
             </div>
             <div className="flex flex-col gap-4">
@@ -992,20 +960,18 @@ export function DesignShowcase() {
                     </TableCell>
                     <TableCell className="font-medium">{row.customer}</TableCell>
                     <TableCell>
-                      <Badge
-                        variant="outline"
-                        className={paymentTone[row.payment]}
-                      >
-                        {row.payment}
-                      </Badge>
+                      <StatusPill
+                        label={row.payment}
+                        tone={toneForStatus(row.payment.toLowerCase())}
+                      />
                     </TableCell>
                     <TableCell>
-                      <Badge
-                        variant="outline"
-                        className={fulfillmentTone[row.fulfillment]}
-                      >
-                        {row.fulfillment}
-                      </Badge>
+                      <StatusPill
+                        label={row.fulfillment}
+                        tone={toneForStatus(
+                          row.fulfillment.toLowerCase().replaceAll(" ", "_")
+                        )}
+                      />
                     </TableCell>
                     <TableCell className="text-right font-mono text-xs tabular-nums">
                       {row.total}

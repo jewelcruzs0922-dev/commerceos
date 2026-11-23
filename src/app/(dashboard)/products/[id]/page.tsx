@@ -121,6 +121,7 @@ export default async function ProductDetailPage({
               width={320}
               height={320}
               unoptimized
+              loading="eager"
               className="aspect-square w-full rounded-lg border border-border object-cover"
             />
           ) : (
@@ -129,7 +130,7 @@ export default async function ProductDetailPage({
             </div>
           )}
 
-          <dl className="flex flex-col gap-2.5 rounded-lg border border-border bg-card p-4 text-xs">
+          <dl className="flex flex-col gap-2.5 border-y border-border py-3 text-xs">
             <div className="flex items-baseline justify-between gap-3">
               <dt className="text-muted-foreground">Total on hand</dt>
               <dd className="font-mono tabular-nums">
@@ -170,21 +171,21 @@ export default async function ProductDetailPage({
             ) : null}
           </div>
 
-          <div className="overflow-hidden rounded-lg border border-border">
-            <Table className="min-w-[44rem]">
-              <TableHeader className="bg-muted/60">
+          <div className="ledger-table">
+            <Table className="min-w-0 lg:min-w-[40rem]">
+              <TableHeader className="bg-secondary/55">
                 <TableRow>
                   <TableHead scope="col">Variant</TableHead>
                   <TableHead scope="col" className="text-right">
                     Price
                   </TableHead>
-                  <TableHead scope="col" className="text-right">
+                  <TableHead scope="col" className="hidden text-right sm:table-cell">
                     Cost
                   </TableHead>
-                  <TableHead scope="col" className="text-right">
+                  <TableHead scope="col" className="hidden text-right md:table-cell">
                     On hand
                   </TableHead>
-                  <TableHead scope="col" className="text-right">
+                  <TableHead scope="col" className="hidden text-right md:table-cell">
                     Reserved
                   </TableHead>
                   <TableHead scope="col" className="text-right">
@@ -211,15 +212,15 @@ export default async function ProductDetailPage({
                     <TableCell className="text-right font-mono text-xs tabular-nums">
                       {formatMoney(variant.price_cents)}
                     </TableCell>
-                    <TableCell className="text-right font-mono text-xs tabular-nums">
+                    <TableCell className="hidden text-right font-mono text-xs tabular-nums sm:table-cell">
                       {variant.cost_cents === null
                         ? "—"
                         : formatMoney(variant.cost_cents)}
                     </TableCell>
-                    <TableCell className="text-right font-mono text-xs tabular-nums">
+                    <TableCell className="hidden text-right font-mono text-xs tabular-nums md:table-cell">
                       {variant.onHand}
                     </TableCell>
-                    <TableCell className="text-right font-mono text-xs tabular-nums">
+                    <TableCell className="hidden text-right font-mono text-xs tabular-nums md:table-cell">
                       {variant.reserved}
                     </TableCell>
                     <TableCell className="text-right font-mono text-xs tabular-nums">

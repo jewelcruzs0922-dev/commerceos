@@ -124,21 +124,21 @@ export default async function DiscountDetailPage({
         </div>
 
         {usages.length === 0 ? (
-          <p className="rounded-lg border border-dashed border-border bg-card px-4 py-8 text-center text-sm text-muted-foreground">
+          <p className="border-y border-border py-8 text-center text-sm text-muted-foreground">
             No redemptions yet. Usage is recorded atomically when an order
             applies this code.
           </p>
         ) : (
-          <div className="overflow-hidden rounded-lg border border-border">
-            <Table className="min-w-[38rem]">
-              <TableHeader className="bg-muted/60">
+          <div className="ledger-table">
+            <Table className="min-w-0 sm:min-w-[38rem]">
+              <TableHeader className="bg-secondary/55">
                 <TableRow>
                   <TableHead scope="col">Order</TableHead>
-                  <TableHead scope="col">Customer</TableHead>
+                  <TableHead scope="col" className="hidden md:table-cell">Customer</TableHead>
                   <TableHead scope="col" className="text-right">
                     Applied
                   </TableHead>
-                  <TableHead scope="col" className="text-right">
+                  <TableHead scope="col" className="hidden text-right sm:table-cell">
                     When
                   </TableHead>
                 </TableRow>
@@ -164,7 +164,7 @@ export default async function DiscountDetailPage({
                     <TableCell className="text-right font-mono text-xs tabular-nums">
                       {formatMoney(usage.amount_cents)}
                     </TableCell>
-                    <TableCell className="text-right text-xs text-muted-foreground">
+                    <TableCell className="hidden text-right text-xs text-muted-foreground sm:table-cell">
                       {formatDateTime(usage.created_at)}
                     </TableCell>
                   </TableRow>

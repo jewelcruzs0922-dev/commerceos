@@ -5,9 +5,8 @@ import { BackendRequired } from "@/components/app/backend-required";
 import { EmptyList } from "@/components/app/empty-list";
 import { ListToolbar } from "@/components/app/list-toolbar";
 import { PageHeader } from "@/components/app/page-header";
+import { RecordCount } from "@/components/app/record-count";
 import { Pagination } from "@/components/app/pagination";
-import { StatusPill } from "@/components/app/status-pill";
-import { Badge } from "@/components/ui/badge";
 import {
   Table,
   TableBody,
@@ -17,7 +16,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { requireMemberContext } from "@/lib/auth/session";
-import { formatDate, formatMoney, formatNumber } from "@/lib/format";
+import { formatDate, formatMoney } from "@/lib/format";
 import { parsePage, sanitizeSearch } from "@/lib/list-params";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import {
@@ -34,12 +33,6 @@ const querySchema = z.object({
   sort: z.enum(["newest", "oldest", "name"]).default("newest").catch("newest"),
   page: z.string().optional().catch(undefined),
 });
-
-const classificationTone = {
-  new: "info",
-  returning: "success",
-  none: "neutral",
-} as const;
 
 export default async function CustomersPage({
   searchParams,
@@ -79,11 +72,9 @@ export default async function CustomersPage({
     <div className="flex flex-col gap-6">
       <PageHeader
         title="Customers"
-        description="Profiles, purchase history, and lifetime value. Spend excludes cancelled orders; new means the first order is within 30 days."
+        description="Spend excludes cancelled orders. New means the first order is within 30 days."
         status={
-          <Badge variant="outline" className="font-mono text-[11px]">
-            {formatNumber(total)}
-          </Badge>
+          <RecordCount value={total} label="customers" />
         }
       />
 
@@ -113,22 +104,22 @@ export default async function CustomersPage({
         />
       ) : (
         <>
-          <div className="overflow-hidden rounded-lg border border-border">
-            <Table className="min-w-[48rem]">
-              <TableHeader className="bg-muted/60">
+          <div className="ledger-table">
+            <Table className="min-w-0 sm:min-w-[32rem] lg:min-w-[48rem]">
+              <TableHeader className="bg-secondary/55">
                 <TableRow>
                   <TableHead scope="col">Customer</TableHead>
-                  <TableHead scope="col" className="text-right">
+                  <TableHead scope="col" className="hidden text-right sm:table-cell">
                     Orders
                   </TableHead>
-                  <TableHead scope="col" className="text-right">
+                  <TableHead scope="col" className="hidden text-right sm:table-cell">
                     Spend
                   </TableHead>
-                  <TableHead scope="col" className="text-right">
+                  <TableHead scope="col" className="hidden text-right lg:table-cell">
                     AOV
                   </TableHead>
-                  <TableHead scope="col">Type</TableHead>
-                  <TableHead scope="col" className="text-right">
+                  <TableHead scope="col" className="hidden md:table-cell">Type</TableHead>
+                  <TableHead scope="col" className="hidden text-right sm:table-cell">
                     Since
                   </TableHead>
                 </TableRow>
@@ -136,8 +127,8 @@ export default async function CustomersPage({
               <TableBody>
                 {rows.map((customer) => (
                   <TableRow key={customer.id} className="h-13">
-                    <TableCell>
-                      <div className="flex min-w-0 flex-col">
+                    <TableCell className="max-w-[11rem] sm:max-w-none">
+                      <div className="flex min-w-0 max-w-[11rem] flex-col sm:max-w-none">
                         <Link
                           href={`/customers/${customer.id}`}
                           className="truncate font-medium underline-offset-4 hover:underline"
@@ -147,12 +138,15 @@ export default async function CustomersPage({
                         <span className="truncate text-xs text-muted-foreground">
                           {customer.email}
                         </span>
+                        <span className="mt-1 font-mono text-xs tabular-nums sm:hidden">
+                          {formatMoney(customer.spendCents)} spent
+                        </span>
                       </div>
                     </TableCell>
-                    <TableCell className="text-right font-mono text-xs tabular-nums">
+                    <TableCell className="hidden text-right font-mono text-xs tabular-nums sm:table-cell">
                       {customer.orderCount}
                     </TableCell>
-                    <TableCell className="text-right font-mono text-xs tabular-nums">
+                    <TableCell className="hidden text-right font-mono text-xs tabular-nums sm:table-cell">
                       {formatMoney(customer.spendCents)}
                     </TableCell>
                     <TableCell className="text-right font-mono text-xs tabular-nums">
@@ -160,17 +154,14 @@ export default async function CustomersPage({
                         ? formatMoney(customer.averageOrderCents)
                         : "—"}
                     </TableCell>
-                    <TableCell>
-                      <StatusPill
-                        label={
-                          customer.classification === "none"
-                            ? "No orders"
-                            : customer.classification
-                        }
-                        tone={classificationTone[customer.classification]}
-                      />
+                    <TableCell className="hidden md:table-cell">
+                      <span className="text-xs text-muted-foreground capitalize">
+                        {customer.classification === "none"
+                          ? "No orders"
+                          : customer.classification}
+                      </span>
                     </TableCell>
-                    <TableCell className="text-right text-xs text-muted-foreground">
+                    <TableCell className="hidden text-right text-xs text-muted-foreground sm:table-cell">
                       {formatDate(customer.createdAt)}
                     </TableCell>
                   </TableRow>

@@ -33,7 +33,7 @@ export function NavLinks({
         >
           <p
             className={cn(
-              "px-2.5 pt-3 pb-1 text-[11px] leading-4 font-medium text-muted-foreground",
+              "px-2.5 pt-3 pb-1 text-[11px] leading-4 font-medium text-sidebar-foreground/80",
               collapsed && "sr-only"
             )}
           >
@@ -52,20 +52,13 @@ export function NavLinks({
                   aria-current={active ? "page" : undefined}
                   title={collapsed ? item.label : undefined}
                   className={cn(
-                    "relative flex h-9 items-center gap-2.5 rounded-md text-[13px] font-medium transition-colors outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring",
-                    collapsed ? "justify-center px-0" : "px-2.5",
+                    "relative flex h-10 items-center gap-2.5 rounded-xl text-[13px] font-medium transition-colors outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring",
+                    collapsed ? "justify-center px-0" : "px-3",
                     active
                       ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                      : "text-muted-foreground hover:bg-sidebar-accent/60 hover:text-sidebar-foreground"
+                      : "text-sidebar-foreground/80 hover:bg-white/10 hover:text-sidebar-foreground"
                   )}
                 >
-                  <span
-                    aria-hidden="true"
-                    className={cn(
-                      "absolute top-1/2 left-0 h-5 w-[2px] -translate-y-1/2 rounded-full bg-primary transition-opacity",
-                      active ? "opacity-100" : "opacity-0"
-                    )}
-                  />
                   <item.icon
                     aria-hidden="true"
                     className="size-[18px] shrink-0"

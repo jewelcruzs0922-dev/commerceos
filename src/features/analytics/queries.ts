@@ -83,60 +83,54 @@ export async function getAnalytics(input: {
   storeId: string;
   timeZone: string;
   range: AnalyticsRange;
+  includeProductPerformance?: boolean;
 }): Promise<AnalyticsResult> {
   const supabase = await createClient();
   const { storeId, range } = input;
+  const includeProductPerformance = input.includeProductPerformance ?? true;
 
-  const [
-    { data: currentOrders, error: currentOrderError },
-    { data: currentRefunds },
-    { data: previousOrders },
-    { data: previousRefunds },
-  ] = await Promise.all([
-    supabase
-      .from("orders")
-      .select("id, total_cents, status, placed_at, customer_id")
-      .eq("store_id", storeId)
-      .gte("placed_at", range.startUtc)
-      .lt("placed_at", range.endUtc)
-      .limit(10000),
-    supabase
-      .from("refunds")
-      .select("amount_cents, status, created_at")
-      .eq("store_id", storeId)
-      .eq("status", "completed")
-      .gte("created_at", range.startUtc)
-      .lt("created_at", range.endUtc)
-      .limit(10000),
-    supabase
-      .from("orders")
-      .select("id, total_cents, status, placed_at, customer_id")
-      .eq("store_id", storeId)
-      .gte("placed_at", range.priorStartUtc)
-      .lt("placed_at", range.priorEndUtc)
-      .limit(10000),
-    supabase
-      .from("refunds")
-      .select("amount_cents, status, created_at")
-      .eq("store_id", storeId)
-      .eq("status", "completed")
-      .gte("created_at", range.priorStartUtc)
-      .lt("created_at", range.priorEndUtc)
-      .limit(10000),
-  ]);
+  const [{ data: periodOrders, error: orderError }, { data: periodRefunds }] =
+    await Promise.all([
+      supabase
+        .from("orders")
+        .select("id, total_cents, status, placed_at, customer_id")
+        .eq("store_id", storeId)
+        .gte("placed_at", range.priorStartUtc)
+        .lt("placed_at", range.endUtc)
+        .limit(20000),
+      supabase
+        .from("refunds")
+        .select("amount_cents, status, created_at")
+        .eq("store_id", storeId)
+        .eq("status", "completed")
+        .gte("created_at", range.priorStartUtc)
+        .lt("created_at", range.endUtc)
+        .limit(20000),
+    ]);
 
-  if (currentOrderError) {
+  if (orderError) {
     throw new Error("Could not load analytics");
   }
 
-  const orders = (currentOrders ?? []) as OrderMetricRow[];
-  const refunds = (currentRefunds ?? []) as RefundMetricRow[];
-  const previousOrderRows = (previousOrders ?? []) as OrderMetricRow[];
-  const previousRefundRows = (previousRefunds ?? []) as RefundMetricRow[];
-
-  const activeOrderIds = orders
-    .filter((order) => order.status !== "cancelled")
-    .map((order) => order.id);
+  const allOrders = (periodOrders ?? []) as OrderMetricRow[];
+  const allRefunds = (periodRefunds ?? []) as RefundMetricRow[];
+  const orders = allOrders.filter(
+    (order) =>
+      order.placed_at >= range.startUtc && order.placed_at < range.endUtc
+  );
+  const refunds = allRefunds.filter(
+    (refund) =>
+      refund.created_at >= range.startUtc && refund.created_at < range.endUtc
+  );
+  const previousOrderRows = allOrders.filter(
+    (order) =>
+      order.placed_at >= range.priorStartUtc && order.placed_at < range.priorEndUtc
+  );
+  const previousRefundRows = allRefunds.filter(
+    (refund) =>
+      refund.created_at >= range.priorStartUtc &&
+      refund.created_at < range.priorEndUtc
+  );
 
   const items: Array<{
     product_title: string;
@@ -145,14 +139,20 @@ export async function getAnalytics(input: {
     total_cents: number;
   }> = [];
 
-  for (let index = 0; index < activeOrderIds.length; index += 200) {
-    const chunk = activeOrderIds.slice(index, index + 200);
-    const { data } = await supabase
-      .from("order_items")
-      .select("product_title, product_type, quantity, total_cents")
-      .eq("store_id", storeId)
-      .in("order_id", chunk);
-    items.push(...(data ?? []));
+  if (includeProductPerformance) {
+    const activeOrderIds = orders
+      .filter((order) => order.status !== "cancelled")
+      .map((order) => order.id);
+
+    for (let index = 0; index < activeOrderIds.length; index += 200) {
+      const chunk = activeOrderIds.slice(index, index + 200);
+      const { data } = await supabase
+        .from("order_items")
+        .select("product_title, product_type, quantity, total_cents")
+        .eq("store_id", storeId)
+        .in("order_id", chunk);
+      items.push(...(data ?? []));
+    }
   }
 
   const productMap = new Map<string, ProductPerformance>();

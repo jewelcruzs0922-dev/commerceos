@@ -193,6 +193,24 @@ export async function listOrders(query: {
   };
 }
 
+export async function countOrders(query: {
+  storeId: string;
+  status: OrderStatus;
+}): Promise<number> {
+  const supabase = await createClient();
+  const { count, error } = await supabase
+    .from("orders")
+    .select("id", { count: "exact", head: true })
+    .eq("store_id", query.storeId)
+    .eq("status", query.status);
+
+  if (error) {
+    throw new Error("Could not count orders");
+  }
+
+  return count ?? 0;
+}
+
 export async function listOrdersForExport(query: {
   storeId: string;
   filters: OrderFilters;

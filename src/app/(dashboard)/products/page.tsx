@@ -7,9 +7,9 @@ import { BackendRequired } from "@/components/app/backend-required";
 import { EmptyList } from "@/components/app/empty-list";
 import { ListToolbar } from "@/components/app/list-toolbar";
 import { PageHeader } from "@/components/app/page-header";
+import { RecordCount } from "@/components/app/record-count";
 import { Pagination } from "@/components/app/pagination";
 import { StatusPill, toneForStatus } from "@/components/app/status-pill";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -81,11 +81,8 @@ export default async function ProductsPage({
     <div className="flex flex-col gap-6">
       <PageHeader
         title="Products"
-        description="The catalog record for every product, with variants, media, pricing, and inventory."
         status={
-          <Badge variant="outline" className="font-mono text-[11px]">
-            {formatNumber(total)}
-          </Badge>
+          <RecordCount value={total} label="products" />
         }
         actions={
           canManage ? (
@@ -149,19 +146,19 @@ export default async function ProductsPage({
         />
       ) : (
         <>
-          <div className="overflow-hidden rounded-lg border border-border">
-            <Table className="min-w-[46rem]">
-              <TableHeader className="bg-muted/60">
+          <div className="ledger-table">
+            <Table className="min-w-0 sm:min-w-[34rem] lg:min-w-[46rem]">
+              <TableHeader className="bg-secondary/55">
                 <TableRow>
                   <TableHead scope="col">Product</TableHead>
-                  <TableHead scope="col">Status</TableHead>
-                  <TableHead scope="col" className="text-right">
+                  <TableHead scope="col" className="hidden sm:table-cell">Status</TableHead>
+                  <TableHead scope="col" className="hidden text-right sm:table-cell">
                     Variants
                   </TableHead>
                   <TableHead scope="col" className="text-right">
                     From
                   </TableHead>
-                  <TableHead scope="col" className="text-right">
+                  <TableHead scope="col" className="hidden text-right md:table-cell">
                     On hand
                   </TableHead>
                 </TableRow>
@@ -198,22 +195,28 @@ export default async function ProductsPage({
                           <span className="truncate text-xs text-muted-foreground">
                             {product.vendor || product.slug}
                           </span>
+                          <span className="mt-1 sm:hidden">
+                            <StatusPill
+                              label={product.status}
+                              tone={toneForStatus(product.status)}
+                            />
+                          </span>
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="hidden sm:table-cell">
                       <StatusPill
                         label={product.status}
                         tone={toneForStatus(product.status)}
                       />
                     </TableCell>
-                    <TableCell className="text-right font-mono text-xs tabular-nums">
+                    <TableCell className="hidden text-right font-mono text-xs tabular-nums sm:table-cell">
                       {product.variantCount}
                     </TableCell>
                     <TableCell className="text-right font-mono text-xs tabular-nums">
                       {formatMoney(product.minPriceCents)}
                     </TableCell>
-                    <TableCell className="text-right font-mono text-xs tabular-nums">
+                    <TableCell className="hidden text-right font-mono text-xs tabular-nums md:table-cell">
                       {formatNumber(product.totalOnHand)}
                     </TableCell>
                   </TableRow>

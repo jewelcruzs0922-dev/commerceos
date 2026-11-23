@@ -185,6 +185,24 @@ export async function listReturns(query: {
   };
 }
 
+export async function countReturns(query: {
+  storeId: string;
+  status: ReturnStatus;
+}): Promise<number> {
+  const supabase = await createClient();
+  const { count, error } = await supabase
+    .from("returns")
+    .select("id", { count: "exact", head: true })
+    .eq("store_id", query.storeId)
+    .eq("status", query.status);
+
+  if (error) {
+    throw new Error("Could not count returns");
+  }
+
+  return count ?? 0;
+}
+
 export async function getReturnDetail(
   storeId: string,
   returnId: string

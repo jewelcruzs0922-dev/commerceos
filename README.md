@@ -26,11 +26,11 @@ A separate staging Supabase project and Vercel deployment are live. HTTP Basic p
 | --- |
 | ![Analytics](docs/screenshots/analytics.png) |
 
-Screenshots are captured from the production build against the seeded read-only demo.
+Screenshots are captured against the seeded demo workspace.
 
 ## Features
 
-- **Overview:** period metrics, comparisons, recent orders, low-stock alerts, pending work, and a reconciled demo banner.
+- **Overview:** one primary and three supporting period metrics, comparisons, a ledger-style recent-orders table, and a consolidated low-stock/returns/pending-orders attention panel.
 - **Products and variants:** search, filters, sorting, pagination, create/edit, archive/restore, duplicate, variants, SKU/barcode, pricing, cost, and URLs for demonstration imagery.
 - **Collections:** product counts, create/edit, status, image URL, and atomic product assignment.
 - **Orders:** filters, search, CSV export, line-item snapshots, payment/refund records, submitted timeline, cancellation, partial/full fulfillment, and return requests.
@@ -152,7 +152,7 @@ Full instructions and troubleshooting: [`docs/setup-guide.md`](docs/setup-guide.
 ## Demo environment
 
 - **Try the read-only demo** creates an anonymous Supabase session and joins the demo store as a `viewer`. All capabilities and RLS policies block writes.
-- The demo banner labels every page as fictional and reconciled. Metrics are derived from persisted records.
+- Compact demo labeling and a footer disclosure identify the data as fictional. Metrics are derived from persisted records.
 - **Reset** is visible to owners/admins of an `is_demo` store when `DEMO_MODE=true`. It is confirmed twice and regenerates the seeded dataset.
 - Anonymous accounts accumulate in Supabase Auth. Reset clears demo memberships, not auth users.
 - Team data shows the real owner account rather than fictional staff profiles.

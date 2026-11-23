@@ -58,7 +58,7 @@ export default async function ReportsPage() {
     <div className="flex flex-col gap-8">
       <PageHeader
         title="Reports"
-        description={`Live report views for the last 90 days (${range.label}). Definitions are documented and shared with Analytics.`}
+        description={`Last 90 days · ${range.label}`}
         actions={
           <Button asChild variant="outline" size="sm">
             <a href={exportHref}>
@@ -69,7 +69,7 @@ export default async function ReportsPage() {
         }
       />
 
-      <div className="grid gap-px overflow-hidden rounded-lg border border-border bg-border sm:grid-cols-3">
+      <div className="stat-strip grid gap-px border-y border-border bg-border sm:grid-cols-3">
         {[
           {
             label: "Net sales",
@@ -80,20 +80,35 @@ export default async function ReportsPage() {
             label: "Refunds",
             value: formatMoney(result.current.refundsCents),
           },
-        ].map((metric) => (
-          <div key={metric.label} className="bg-card p-4">
-            <p className="text-xs font-medium text-muted-foreground">
+        ].map((metric, index) => (
+          <div
+            key={metric.label}
+            className={index === 0 ? "bg-sidebar p-4 text-sidebar-foreground" : "bg-card p-4"}
+          >
+            <p
+              className={
+                index === 0
+                  ? "text-xs font-medium text-sidebar-foreground/85"
+                  : "text-xs font-medium text-muted-foreground"
+              }
+            >
               {metric.label}
             </p>
-            <p className="mt-1 font-mono text-[24px] leading-8 font-semibold tabular-nums">
+            <p
+              className={
+                index === 0
+                  ? "mt-1 font-mono text-[32px] leading-10 font-semibold tabular-nums text-highlight"
+                  : "mt-1 font-mono text-[22px] leading-7 font-semibold tabular-nums"
+              }
+            >
               {metric.value}
             </p>
           </div>
         ))}
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-2">
-        <section className="flex flex-col gap-2 rounded-lg border border-border bg-card p-4">
+      <div className="grid gap-x-10 gap-y-6 lg:grid-cols-2">
+        <section className="flex flex-col gap-2 border-t border-border pt-4">
           <h2 className="text-sm font-semibold">Sales summary</h2>
           <p className="text-xs leading-5 text-muted-foreground">
             Gross sales, refunds, net sales, orders, customers, and average
@@ -111,7 +126,7 @@ export default async function ReportsPage() {
           </div>
         </section>
 
-        <section className="flex flex-col gap-2 rounded-lg border border-border bg-card p-4">
+        <section className="flex flex-col gap-2 border-t border-border pt-4">
           <h2 className="text-sm font-semibold">Product performance</h2>
           <p className="text-xs leading-5 text-muted-foreground">
             Top products and categories by revenue using order-item snapshots.
@@ -131,7 +146,7 @@ export default async function ReportsPage() {
           </div>
         </section>
 
-        <section className="flex flex-col gap-2 rounded-lg border border-border bg-card p-4">
+        <section className="flex flex-col gap-2 border-t border-border pt-4">
           <h2 className="text-sm font-semibold">Refund activity</h2>
           <p className="text-xs leading-5 text-muted-foreground">
             Completed refunds created in range, regardless of the original
@@ -147,7 +162,7 @@ export default async function ReportsPage() {
           </div>
         </section>
 
-        <section className="flex flex-col gap-2 rounded-lg border border-border bg-card p-4">
+        <section className="flex flex-col gap-2 border-t border-border pt-4">
           <h2 className="text-sm font-semibold">Report definitions</h2>
           <ul className="flex flex-col gap-1.5 text-xs leading-5 text-muted-foreground">
             <li>Net sales = non-cancelled order totals − completed refunds.</li>
@@ -160,7 +175,7 @@ export default async function ReportsPage() {
 
       <section
         aria-labelledby="reconciliation-title"
-        className="flex flex-col gap-3 rounded-lg border border-border bg-card p-4"
+        className="flex flex-col gap-3 border-y border-border py-4"
       >
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex flex-col gap-1">
@@ -182,7 +197,7 @@ export default async function ReportsPage() {
           />
         </div>
         <dl className="grid gap-3 text-xs sm:grid-cols-2">
-          <div className="flex items-center justify-between gap-3 rounded-md border border-border px-3 py-2">
+          <div className="flex items-center justify-between gap-3 border-t border-border py-2">
             <dt className="text-muted-foreground">
               Orders checked · {formatNumber(reconciliation.ordersChecked)}
             </dt>
@@ -190,7 +205,7 @@ export default async function ReportsPage() {
               {formatNumber(reconciliation.orderIssues)} flagged
             </dd>
           </div>
-          <div className="flex items-center justify-between gap-3 rounded-md border border-border px-3 py-2">
+          <div className="flex items-center justify-between gap-3 border-t border-border py-2">
             <dt className="text-muted-foreground">
               Variants checked · {formatNumber(reconciliation.variantsChecked)}
             </dt>

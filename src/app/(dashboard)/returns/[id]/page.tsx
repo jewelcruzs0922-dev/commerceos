@@ -80,7 +80,7 @@ export default async function ReturnDetailPage({
         }
       />
 
-      <div className="grid gap-px overflow-hidden rounded-lg border border-border bg-border sm:grid-cols-2 xl:grid-cols-4">
+      <div className="stat-strip grid grid-cols-2 gap-px border-y border-border bg-border xl:grid-cols-4">
         {[
           { label: "Refund value", value: formatMoney(refundCents) },
           {
@@ -119,9 +119,9 @@ export default async function ReturnDetailPage({
               Open order
             </Link>
           </div>
-          <div className="overflow-hidden rounded-lg border border-border">
-            <Table className="min-w-[36rem]">
-              <TableHeader className="bg-muted/60">
+          <div className="ledger-table">
+            <Table className="min-w-0 sm:min-w-[36rem]">
+              <TableHeader className="bg-secondary/55">
                 <TableRow>
                   <TableHead scope="col">Item</TableHead>
                   <TableHead scope="col" className="text-right">
@@ -130,7 +130,7 @@ export default async function ReturnDetailPage({
                   <TableHead scope="col" className="text-right">
                     Refund
                   </TableHead>
-                  <TableHead scope="col">Restock</TableHead>
+                  <TableHead scope="col" className="hidden sm:table-cell">Restock</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -153,7 +153,7 @@ export default async function ReturnDetailPage({
                     <TableCell className="text-right font-mono text-xs tabular-nums">
                       {formatMoney(item.refundCents)}
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="hidden sm:table-cell">
                       <StatusPill
                         label={item.restock ? "Eligible" : "No"}
                         tone={item.restock ? "info" : "neutral"}
@@ -167,7 +167,7 @@ export default async function ReturnDetailPage({
         </section>
 
         <div className="flex flex-col gap-6">
-          <section className="flex flex-col gap-2 rounded-lg border border-border bg-card p-4">
+          <section className="flex flex-col gap-2 border-t border-border pt-4">
             <h2 className="text-sm font-semibold">Reason</h2>
             <p className="text-sm leading-6 text-muted-foreground">
               {ret.reason || "No reason provided."}
@@ -184,7 +184,7 @@ export default async function ReturnDetailPage({
             ) : null}
           </section>
 
-          <section className="flex flex-col gap-2 rounded-lg border border-border bg-card p-4">
+          <section className="flex flex-col gap-2 border-t border-border pt-4">
             <h2 className="text-sm font-semibold">Order refunds</h2>
             {refunds.length === 0 ? (
               <p className="text-xs text-muted-foreground">

@@ -318,7 +318,7 @@ export function OrderForm({
           </section>
         </div>
 
-        <aside className="flex h-fit flex-col gap-5 rounded-lg border border-border bg-card p-4 xl:sticky xl:top-20">
+        <aside className="flex h-fit flex-col gap-5 rounded-xl border border-primary/15 bg-secondary/60 p-4 xl:sticky xl:top-20">
           <h2 className="text-sm font-semibold">Order summary</h2>
 
           <dl className="flex flex-col gap-1.5 text-sm">

@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { ActionButton } from "@/components/app/action-button";
 import { BackendRequired } from "@/components/app/backend-required";
 import { PageHeader } from "@/components/app/page-header";
+import { RecordCount } from "@/components/app/record-count";
 import { StatusPill } from "@/components/app/status-pill";
-import { Badge } from "@/components/ui/badge";
 import {
   Table,
   TableBody,
@@ -48,18 +48,16 @@ export default async function TeamPage() {
     <div className="flex flex-col gap-8">
       <PageHeader
         title="Team"
-        description="Roles are enforced by the server and RLS. Owners keep final control; admins cannot grant or remove ownership."
+        description="Roles are enforced by the server and RLS. Admins cannot grant ownership."
         status={
-          <Badge variant="outline" className="font-mono text-[11px]">
-            {team.members.length} members
-          </Badge>
+          <RecordCount value={team.members.length} label="members" />
         }
       />
 
       {canManage ? (
         <section
           aria-labelledby="invite-title"
-          className="flex flex-col gap-3 rounded-lg border border-border bg-card p-4"
+          className="flex flex-col gap-3 border-y border-border py-4"
         >
           <div className="flex flex-col gap-0.5">
             <h2 id="invite-title" className="text-sm font-semibold">
@@ -78,14 +76,14 @@ export default async function TeamPage() {
         <h2 id="members-title" className="text-sm font-semibold">
           Members
         </h2>
-        <div className="overflow-hidden rounded-lg border border-border">
-          <Table className="min-w-[44rem]">
-            <TableHeader className="bg-muted/60">
+        <div className="ledger-table">
+          <Table className="min-w-0 sm:min-w-[36rem] lg:min-w-[44rem]">
+            <TableHeader className="bg-secondary/55">
               <TableRow>
                 <TableHead scope="col">Member</TableHead>
-                <TableHead scope="col">Role</TableHead>
-                <TableHead scope="col">Status</TableHead>
-                <TableHead scope="col">Joined</TableHead>
+                <TableHead scope="col" className="hidden md:table-cell">Role</TableHead>
+                <TableHead scope="col" className="hidden sm:table-cell">Status</TableHead>
+                <TableHead scope="col" className="hidden sm:table-cell">Joined</TableHead>
                 {canManage ? <TableHead scope="col">Actions</TableHead> : null}
               </TableRow>
             </TableHeader>
@@ -94,7 +92,7 @@ export default async function TeamPage() {
                 const isSelf = member.userId === context.userId;
                 return (
                   <TableRow key={member.id} className="h-13">
-                    <TableCell>
+                    <TableCell className="max-w-[11rem] md:max-w-none">
                       <div className="flex min-w-0 flex-col">
                         <span className="truncate font-medium">
                           {member.name}
@@ -107,9 +105,30 @@ export default async function TeamPage() {
                         <span className="truncate text-xs text-muted-foreground">
                           {member.email}
                         </span>
+                        <span className="mt-1 sm:hidden">
+                          <StatusPill
+                            label={member.status}
+                            tone={
+                              member.status === "active" ? "success" : "warning"
+                            }
+                          />
+                        </span>
+                        <div className="mt-2 md:hidden">
+                          {canManage && !isSelf ? (
+                            <MemberRoleForm
+                              memberId={member.id}
+                              role={member.role}
+                              canGrantOwner={context.membership.role === "owner"}
+                            />
+                          ) : (
+                            <span className="text-xs capitalize text-muted-foreground">
+                              {member.role}
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="hidden md:table-cell">
                       {canManage && !isSelf ? (
                         <MemberRoleForm
                           memberId={member.id}
@@ -120,13 +139,13 @@ export default async function TeamPage() {
                         <span className="text-sm capitalize">{member.role}</span>
                       )}
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="hidden sm:table-cell">
                       <StatusPill
                         label={member.status}
                         tone={member.status === "active" ? "success" : "warning"}
                       />
                     </TableCell>
-                    <TableCell className="text-xs text-muted-foreground">
+                    <TableCell className="hidden text-xs text-muted-foreground sm:table-cell">
                       {formatDate(member.joinedAt)}
                     </TableCell>
                     {canManage ? (
@@ -177,18 +196,18 @@ export default async function TeamPage() {
               </p>
             </div>
             {team.invitations.length === 0 ? (
-              <p className="rounded-lg border border-dashed border-border bg-card px-4 py-6 text-sm text-muted-foreground">
+              <p className="border-y border-dashed border-border py-6 text-sm text-muted-foreground">
                 No invitations yet.
               </p>
             ) : (
-              <div className="overflow-hidden rounded-lg border border-border">
-                <Table className="min-w-[42rem]">
-                  <TableHeader className="bg-muted/60">
+              <div className="ledger-table">
+                <Table className="min-w-0 sm:min-w-[32rem] lg:min-w-[42rem]">
+                  <TableHeader className="bg-secondary/55">
                     <TableRow>
                       <TableHead scope="col">Email</TableHead>
                       <TableHead scope="col">Role</TableHead>
-                      <TableHead scope="col">Status</TableHead>
-                      <TableHead scope="col">Expires</TableHead>
+                      <TableHead scope="col" className="hidden sm:table-cell">Status</TableHead>
+                      <TableHead scope="col" className="hidden sm:table-cell">Expires</TableHead>
                       <TableHead scope="col">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -213,7 +232,7 @@ export default async function TeamPage() {
                             }
                           />
                         </TableCell>
-                        <TableCell className="text-xs text-muted-foreground">
+                        <TableCell className="hidden text-xs text-muted-foreground sm:table-cell">
                           {formatDate(invitation.expires_at)}
                         </TableCell>
                         <TableCell>
@@ -244,11 +263,11 @@ export default async function TeamPage() {
               Activity
             </h2>
             {team.activity.length === 0 ? (
-              <p className="rounded-lg border border-dashed border-border bg-card px-4 py-6 text-sm text-muted-foreground">
+              <p className="border-y border-dashed border-border py-6 text-sm text-muted-foreground">
                 No recorded activity yet.
               </p>
             ) : (
-              <ul className="flex flex-col rounded-lg border border-border bg-card">
+              <ul className="flex flex-col border-y border-border">
                 {team.activity.map((entry) => (
                   <li
                     key={entry.id}

@@ -4,9 +4,9 @@
 
 ## Current state
 
-- **Current phase:** Public Portfolio Release Preparation (remote CI passed; public access/branch protection awaiting approval)
-- **Last completed phase:** Remote CI Verification (2026-11-21)
-- **Overall status:** Implementation, demo, QA, handoff, hardening, and staging verification are complete. A separate staging Supabase project and Vercel staging deployment are live at https://commerceos-staging.vercel.app. All migrations and demo data are applied; HTTP Basic protection blocks unauthenticated document requests; guest Auth/session/sign-out, CSP/headers, responsive layouts, accessibility, and export checks pass 10/10 Playwright tests against the protected hosted URL. No public production/demo approval exists.
+- **Current phase:** Visual Refinement — green/yellow identity applied and verified
+- **Last completed phase:** Green/Yellow Visual Redesign (2026-11-22)
+- **Overall status:** Implementation, demo, QA, handoff, hardening, and staging verification are complete. A separate staging Supabase project and Vercel staging deployment are live at https://commerceos-staging.vercel.app. All migrations and demo data are applied; HTTP Basic protection blocks unauthenticated document requests; guest Auth/session/sign-out, CSP/headers, responsive layouts, accessibility, and export checks pass 10/10 Playwright tests against the protected hosted URL. The interface now uses the green/yellow Retail Operations direction: full-bleed deep green shell and auth rail, soft neutral canvas, white rounded work surface, bright yellow demo/attention/selected navigation/chart highlights, green primary actions, open ledger tables, responsive table adaptations, and simplified empty states. No public production/demo approval exists.
 - **Deployment status:** Staging deployed at https://commerceos-staging.vercel.app. No custom domain, deployment protection, or public production/demo approval.
 - **Production approval:** Not granted
 
@@ -22,14 +22,14 @@
 - Data: fictional seeded data only
 - Roles: owner, admin, manager, staff, plus read-only viewer for the demo
 - Initial scope excludes Shopify integration, real checkout, and real payment processing
-- Visual direction: emerald accent, Geist Sans/Geist Mono, light-first with a designed dark theme. Tokens live in `src/app/globals.css`; the reference route is `/design`. `.opencode/skills/commerceos-design/references/design-system.md` was rewritten to this direction and no longer describes the older "Ledger" amber/IBM Plex system.
+- Visual direction: full-bleed deep green shell, soft neutral canvas, white work surface, bright yellow selective highlight, green primary actions, near-black text; Geist Sans/Geist Mono; light-only interface. Tokens live in `src/app/globals.css`; the reference route is `/design`. `.opencode/skills/commerceos-design/references/design-system.md` documents this direction.
 
 ## Phase log
 
 | Phase | Name | Status | Date | Notes |
 |---|---|---|---|---|
 | 01 | Project Foundation | Complete | 2026-11-19 | Next.js 16.4.6, React 19.3.1, TS 5.9 strict, Tailwind 4.3.5, ESLint 9 |
-| 02 | Design System | Complete | 2026-11-20 | Emerald/Geist tokens, shadcn primitives, brand assets, `/design` showcase |
+| 02 | Design System | Complete | 2026-11-20 | Tokenized light theme, Geist, shadcn primitives, brand assets, `/design` showcase |
 | 03 | Application Shell | Complete | 2026-11-20 | Responsive shell, grouped navigation, breadcrumbs, module routes, honest placeholders |
 | 04 | Supabase Backend and Security | Complete | 2026-11-20 | Schema, RLS, auth flows, permissions; hosted project applied and exercised |
 | 05 | Core Commerce Modules | Complete | 2026-11-20 | Products, collections, orders, customers, inventory; transactional workflows; 60 tests |
@@ -43,6 +43,7 @@
 | 10.3 | Staging Deployment and Verification | Complete | 2026-11-21 | Separate staging Supabase + Vercel; hosted 10/10 E2E; CSP/headers/auth guest flow verified |
 | 10.4 | Staging Protection | Complete | 2026-11-21 | App-level HTTP Basic protection; unauth 401; hosted 10/10 with credentials; public demo not approved |
 | 10.5 | Remote CI Verification | Complete | 2026-11-21 | Private GitHub repo; CI verify + PostgreSQL database jobs pass; branch protection blocked by plan; no public demo |
+| 11 | Site-wide Visual Refinement | Complete | 2026-11-22 | Green/yellow Retail Operations identity applied across shell, auth, Overview, list modules, Analytics, Reports, Team, toolbars, tables, status labels, loading, empty states, detail screens, and Settings; responsive tables adapted; stale Supabase keep-alive stalls reduced and dashboard over-fetch reduced; 128 unit tests, manual axe/overflow, build pass; demo-login E2E rate-limited |
 
 ## Environment and setup
 
@@ -304,3 +305,22 @@
 - **Manual user setup:** decide whether to make the repository public (then configure branch protection) or upgrade GitHub; approve public demo before removing Basic Auth.
 
 **Remote CI is verified. Public release remains unapproved.**
+
+## Site-wide Visual Refinement report
+
+- **Phase:** Site-wide Visual Refinement
+- **Status:** Complete across the shell, auth, Overview, list modules, detail screens, Analytics, Reports, Team, and Settings.
+- **Direction:** Green/Yellow Retail Operations. Deep green shell, green primary actions, bright yellow selective highlights, white work surfaces, near-black type. Geist Sans/Mono only; no serif, gradient, glass, decorative card grid, or capsule status pills.
+- **Changed:**
+  - Overview: open performance section with primary/supporting metrics, ledger recent orders, deliberate mobile order list, unified attention panel.
+  - All list modules: open ledger tables with tinted headers, 48px rows, plain mono record counts, and transparent filter/sort controls.
+  - Analytics: one primary and three supporting metrics, open chart section, ledger product table, open categories rail, and a metric-definitions disclosure.
+  - Reports: open metric strip, open report descriptions, and open integrity checks.
+  - Team: open invite, members, invitations, and activity surfaces.
+  - Shared: status capsules replaced by ledger tick plus text; empty states simplified to text and actions; dashboard loading skeleton matched to the open layout; dev indicator disabled locally.
+  - Theme: full-bleed deep green sidebar and auth rail, soft neutral canvas, white rounded work surface, bright yellow demo/attention/selected navigation/chart highlight, green primary actions.
+- **Shared primitives:** `PerformanceSummary`, `SectionHeading`, `RecordCount`, revised `StatusPill`, `EmptyList`, `.ledger-table`, `.stat-strip`, and tokenized highlight surfaces.
+- **Preserved:** All data reads, filters, links, demo boundary, and business logic. No queries, actions, permissions, or schema changed.
+- **Validation:** Lint, typecheck, 128/128 Vitest, and production build (31 routes) pass. Manual axe checks at 1440 and 375 found no serious or critical violations. 375/768/1440 overflow checks pass. The E2E suite passes the unauthenticated redirect and security tests (4/10); all six demo-authenticated tests are blocked because the demo session could not start (`Anonymous sign-ins may be disabled`, consistent with Supabase anonymous rate limiting after repeated verification). The axe contrast findings from an earlier run were fixed and rechecked manually.
+- **Screenshots:** `docs/screenshots/dashboard.png`, `orders.png`, `analytics.png`, and `order-detail.png` refreshed.
+- **Next:** Review the final browser pass and explicitly approve any commit, push, or public release. Public production/demo approval is still not granted.

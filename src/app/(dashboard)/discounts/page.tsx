@@ -7,9 +7,9 @@ import { BackendRequired } from "@/components/app/backend-required";
 import { EmptyList } from "@/components/app/empty-list";
 import { ListToolbar } from "@/components/app/list-toolbar";
 import { PageHeader } from "@/components/app/page-header";
+import { RecordCount } from "@/components/app/record-count";
 import { Pagination } from "@/components/app/pagination";
 import { StatusPill, toneForStatus } from "@/components/app/status-pill";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -20,7 +20,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { requireMemberContext } from "@/lib/auth/session";
-import { formatMoney, formatNumber } from "@/lib/format";
+import { formatMoney } from "@/lib/format";
 import { parsePage, sanitizeSearch } from "@/lib/list-params";
 import { can } from "@/lib/permissions";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
@@ -96,11 +96,9 @@ export default async function DiscountsPage({
     <div className="flex flex-col gap-6">
       <PageHeader
         title="Discounts"
-        description="Codes validate activation, dates, minimums, and limits on redemption. Usage is recorded against the order."
+        description="Activation, dates, minimums, and usage limits are validated on redemption."
         status={
-          <Badge variant="outline" className="font-mono text-[11px]">
-            {formatNumber(total)}
-          </Badge>
+          <RecordCount value={total} label="discounts" />
         }
         actions={
           canManage ? (
@@ -164,17 +162,17 @@ export default async function DiscountsPage({
         />
       ) : (
         <>
-          <div className="overflow-hidden rounded-lg border border-border">
-            <Table className="min-w-[48rem]">
-              <TableHeader className="bg-muted/60">
+          <div className="ledger-table">
+            <Table className="min-w-0 sm:min-w-[32rem] lg:min-w-[48rem]">
+              <TableHeader className="bg-secondary/55">
                 <TableRow>
                   <TableHead scope="col">Code</TableHead>
                   <TableHead scope="col">Value</TableHead>
-                  <TableHead scope="col">Window</TableHead>
-                  <TableHead scope="col" className="text-right">
+                  <TableHead scope="col" className="hidden lg:table-cell">Window</TableHead>
+                  <TableHead scope="col" className="hidden text-right md:table-cell">
                     Minimum
                   </TableHead>
-                  <TableHead scope="col" className="text-right">
+                  <TableHead scope="col" className="hidden text-right sm:table-cell">
                     Usage
                   </TableHead>
                   <TableHead scope="col">Status</TableHead>
@@ -195,7 +193,7 @@ export default async function DiscountsPage({
                       {discountValue(discount.type, discount.value)}
                       <span className="ml-1 text-muted-foreground">off</span>
                     </TableCell>
-                    <TableCell className="whitespace-nowrap text-xs text-muted-foreground">
+                    <TableCell className="hidden whitespace-nowrap text-xs text-muted-foreground lg:table-cell">
                       {discount.starts_at
                         ? format(new Date(discount.starts_at), "MMM d, yyyy")
                         : "Always"}
@@ -204,10 +202,10 @@ export default async function DiscountsPage({
                         ? format(new Date(discount.ends_at), "MMM d, yyyy")
                         : "No end"}
                     </TableCell>
-                    <TableCell className="text-right font-mono text-xs tabular-nums">
+                    <TableCell className="hidden text-right font-mono text-xs tabular-nums md:table-cell">
                       {formatMoney(discount.minimum_subtotal_cents)}
                     </TableCell>
-                    <TableCell className="text-right font-mono text-xs tabular-nums">
+                    <TableCell className="hidden text-right font-mono text-xs tabular-nums sm:table-cell">
                       {discount.usage_count}
                       {discount.usage_limit ? ` / ${discount.usage_limit}` : ""}
                     </TableCell>

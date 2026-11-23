@@ -35,7 +35,8 @@ export function AppShell({
   }
 
   return (
-    <div className="flex min-h-svh bg-background">
+    <div className="min-h-svh bg-background">
+      <div className="flex min-h-svh w-full">
       <a
         href="#main"
         className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:rounded-md focus:bg-background focus:px-3 focus:py-2 focus:text-sm focus:font-medium focus:shadow-overlay"
@@ -55,7 +56,7 @@ export function AppShell({
         onClosedAutoFocus={() => menuButtonRef.current?.focus()}
       />
 
-      <div className="flex min-w-0 flex-1 flex-col">
+      <div className="flex min-w-0 flex-1 flex-col bg-card">
         <Topbar
           onOpenMobileNav={() => setMobileNavOpen(true)}
           menuButtonRef={menuButtonRef}
@@ -69,6 +70,7 @@ export function AppShell({
             {children}
           </div>
         </main>
+      </div>
       </div>
     </div>
   );

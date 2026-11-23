@@ -9,6 +9,11 @@ export async function createClient() {
   const cookieStore = await cookies();
 
   return createServerClient<Database>(url, key, {
+    global: {
+      // Reusing a socket the Supabase gateway closed after idle can stall every
+      // parallel read until the OS timeout.
+      headers: { connection: "close" },
+    },
     cookies: {
       getAll() {
         return cookieStore.getAll();

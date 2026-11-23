@@ -5,9 +5,9 @@ import { BackendRequired } from "@/components/app/backend-required";
 import { EmptyList } from "@/components/app/empty-list";
 import { ListToolbar } from "@/components/app/list-toolbar";
 import { PageHeader } from "@/components/app/page-header";
+import { RecordCount } from "@/components/app/record-count";
 import { Pagination } from "@/components/app/pagination";
 import { StatusPill } from "@/components/app/status-pill";
-import { Badge } from "@/components/ui/badge";
 import {
   Table,
   TableBody,
@@ -85,12 +85,10 @@ export default async function InventoryPage({
     <div className="flex flex-col gap-6">
       <PageHeader
         title="Inventory"
-        description="Variant-level stock. Available is on hand minus reserved; every change writes an immutable movement."
+        description="Available is on hand minus reserved. Every change writes a movement."
         status={
           <div className="flex items-center gap-2">
-            <Badge variant="outline" className="font-mono text-[11px]">
-              {formatNumber(counts.total)} variants
-            </Badge>
+            <RecordCount value={counts.total} label="variants" />
             {counts.low > 0 ? (
               <StatusPill
                 label={`${formatNumber(counts.low)} low stock`}
@@ -143,16 +141,16 @@ export default async function InventoryPage({
         />
       ) : (
         <>
-          <div className="overflow-hidden rounded-lg border border-border">
-            <Table className="min-w-[44rem]">
-              <TableHeader className="bg-muted/60">
+          <div className="ledger-table">
+            <Table className="min-w-0 sm:min-w-[30rem] lg:min-w-[44rem]">
+              <TableHeader className="bg-secondary/55">
                 <TableRow>
                   <TableHead scope="col">Product</TableHead>
-                  <TableHead scope="col">SKU</TableHead>
-                  <TableHead scope="col" className="text-right">
+                  <TableHead scope="col" className="hidden sm:table-cell">SKU</TableHead>
+                  <TableHead scope="col" className="hidden text-right md:table-cell">
                     On hand
                   </TableHead>
-                  <TableHead scope="col" className="text-right">
+                  <TableHead scope="col" className="hidden text-right md:table-cell">
                     Reserved
                   </TableHead>
                   <TableHead scope="col" className="text-right">
@@ -179,13 +177,13 @@ export default async function InventoryPage({
                         </span>
                       </div>
                     </TableCell>
-                    <TableCell className="font-mono text-xs">
+                    <TableCell className="hidden font-mono text-xs sm:table-cell">
                       {item.sku}
                     </TableCell>
-                    <TableCell className="text-right font-mono text-xs tabular-nums">
+                    <TableCell className="hidden text-right font-mono text-xs tabular-nums md:table-cell">
                       {formatNumber(item.onHand)}
                     </TableCell>
-                    <TableCell className="text-right font-mono text-xs tabular-nums">
+                    <TableCell className="hidden text-right font-mono text-xs tabular-nums md:table-cell">
                       {formatNumber(item.reserved)}
                     </TableCell>
                     <TableCell className="text-right font-mono text-xs tabular-nums">

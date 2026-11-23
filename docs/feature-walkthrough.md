@@ -8,9 +8,9 @@ A five-minute guided review for recruiters, hiring managers, and technical revie
 
 Start at `/dashboard`. Point out:
 
-- Fictional-data banner and reconciled seeded metrics.
+- Compact demo labeling, a footer disclosure, and reconciled seeded metrics.
 - Last-30-day net sales, orders, customers, AOV, and previous-period deltas.
-- Recent orders and low-stock/pending-work queues.
+- Ledger-style recent orders and one consolidated attention queue for low stock, returns, and pending orders.
 
 The metrics come from persisted orders, refunds, and order-item snapshots, not hardcoded values.
 

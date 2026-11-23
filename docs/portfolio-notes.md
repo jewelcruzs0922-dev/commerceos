@@ -76,8 +76,8 @@ Evidence is in `tests/rls`, `e2e/security.spec.ts`, `docs/security.md`, and `PRO
 ## Demo script
 
 1. Open `/login` and choose **Try the read-only demo**.
-2. Point out the fictional-data banner and the viewer status in the sidebar.
-3. Show the Overview metrics and low-stock/pending-work panels.
+2. Point out the compact demo disclosure in the Overview header and footer, plus the viewer status in the sidebar.
+3. Show the Overview metric hierarchy, ledger table, and consolidated attention panel.
 4. Open Orders, filter/search, and open an order. Point out historical line-item snapshots and totals.
 5. Show that fulfillment/refund controls are absent for the viewer.
 6. Open Analytics and explain that net sales exclude completed refunds and use the store timezone.

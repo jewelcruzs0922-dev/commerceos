@@ -33,6 +33,11 @@ All notable changes to CommerceOS are recorded here. The project is a portfolio/
 - Public release-candidate review: Basic Auth bypass checks, anonymous rate-limit/cleanup review, backup/reconstruction distinction, GitHub/CI readiness, and final regression evidence.
 - Public release preparation: exact Basic Auth removal/rollback steps, final smoke checklist, feature walkthrough, and read-only anonymous Auth audit SQL.
 - Private GitHub repository, first CI run (verify + real PostgreSQL passed), and branch-protection limitation documented.
+- Overview visual refinement to the Retail Control Surface direction: open ledger sections, primary/supporting metric hierarchy, ledger-style orders, deliberate mobile order list, and unified attention panel. Added a shared `SectionHeading` primitive and refreshed the dashboard screenshot.
+- Replaced capsule status pills with a ledger tick plus text label across tables, detail headers, and cards. Updated the design-system guidance and screenshots.
+- Site-wide visual refinement: shared open ledger tables and stat strips, plain record counts, transparent filter/sort controls, simplified empty states, open Analytics/Reports/Team sections, and a consistent primary/supporting metric hierarchy. No data, query, action, permission, or schema changes.
+- Green/yellow visual theme: full-bleed deep green shell and auth rail, soft neutral canvas, white work surface, bright yellow demo/attention/selected navigation/chart highlights, green primary actions, updated light-only tokens, responsive table adaptations, open detail/Settings layouts, and refreshed screenshots.
+- Performance hardening: closed stale Supabase keep-alive sockets for SSR reads, combined analytics period queries, and replaced dashboard detail fetches with count-only queries. Idle dashboard loads now complete in roughly 0.6-2.3s instead of 15-40s.
 - Operational-readiness report covering the Vercel 2FA deployment blocker, Free-plan backup gap, and anonymous-user lifecycle.
 
 ### Security
@@ -50,7 +55,7 @@ All notable changes to CommerceOS are recorded here. The project is a portfolio/
 
 ### Added
 
-- Next.js 16 App Router, React 19, strict TypeScript, Tailwind CSS v4, shadcn/ui, Geist, and an emerald light/dark design system.
+- Next.js 16 App Router, React 19, strict TypeScript, Tailwind CSS v4, shadcn/ui, Geist, and a tokenized light/dark design system.
 - Responsive application shell with grouped navigation, breadcrumbs, command search, notifications, profile menu, and theme control.
 - Supabase Auth via `@supabase/ssr`, onboarding, store creation, invitations, password flows, and route protection.
 - Multi-tenant Postgres schema: 23 tables, 48 RLS policies, 19 functions, 4 views, indexes, constraints, and deterministic demo seed.

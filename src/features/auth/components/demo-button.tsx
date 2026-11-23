@@ -29,7 +29,7 @@ export function DemoButton() {
       <Button
         type="button"
         variant="outline"
-        className="w-full"
+        className="w-full border-highlight-border bg-highlight-soft text-highlight-foreground hover:bg-highlight hover:text-highlight-foreground"
         onClick={handleClick}
         disabled={pending}
       >
